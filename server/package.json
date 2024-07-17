@@ -1,0 +1,36 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Express server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "script": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhinav455/e-commerce-server.git"
+  },
+  "keywords": [
+    "server"
+  ],
+  "author": "abhinav bhattacharjee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhinav455/e-commerce-server/issues"
+  },
+  "homepage": "https://github.com/abhinav455/e-commerce-server#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.3",
+    "morgan": "^1.10.0",
+    "stripe": "^16.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  }
+}
