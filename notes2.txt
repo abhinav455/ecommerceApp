@@ -1,0 +1,1429 @@
+-------------------------------
+
+
+need payment schema to store customer payment info for record keeping
+any payment system stripe or any other same fundamental APIs ,
+   need to know what info to store and retrieve
+carts that are fulfilled are orders that have been paid for   
+
+when deleting items from cart, deleting elements from the cart array   
+
+------------
+
+db.stores.updateMany(
+    { },
+    { $pull: { fruits: { $in: [ "apples", "oranges" ] }, vegetables: "carrots" ,votes: { $gte: 6 }  }
+)
+
+{
+{$set:},
+{new: true}
+}
+
+{ $pull: { <field1>: <value|condition>, <field2>: <value|condition>, ... } }
+
+
+
+const promise1 = Promise.resolve(3);  
+const promise2 = 42;
+const promise3 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, 'foo');
+});
+
+Promise.all([promise1, promise2, promise3]).then((values) => {
+  console.log(values);
+});
+// Expected output: Array [3, 42, "foo"]
+
+
+let value = cart.products.map(async (id) => await Product.findById(id));  
+//value is array[] of few unresolved and few resolved promises here till all await doesnt returns
+value = await Promise.all(value);
+
+
+The rule is, if the function that is in the then handler returns a value, 
+    the promise resolves/rejects with that value, and if the function returns a promise, 
+    what happens is, the next then clause will be the then clause of the promise the function returned
+Promise.resolve is often used when you don’t know if the value is a promise or not,
+   or when you want to ensure that the returned promise is always resolved.
+
+----------------
+
+      <Modal
+        title="Basic Modal"
+        open={state.visible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={onSubmit}>
+            Edit Profile
+          </Button>,
+        ]}
+
+    the footer and its buttons overrides the logic and display of default onOk and onCancel buttons     
+--------------
+
+
+Promise.all
+reduce fn is like foreach, just instead of accumulator, variable defined outside, 
+   anyways in reduce fn also return acc value returned and stored in outside variable
+
+ {
+    "$__": {
+        "activePaths": {
+            "paths": {
+                "userId": "init",
+                "products": "init",
+                "fulfilled": "init",
+                "_id": "init",
+                "createdAt": "init",
+                "updatedAt": "init",
+                "__v": "init"
+            },
+            "states": {
+                "require": {},
+                "default": {},
+                "init": {
+                    "_id": true,
+                    "products": true,
+                    "userId": true,
+                    "fulfilled": true,
+                    "createdAt": true,
+                    "updatedAt": true,
+                    "__v": true
+                }
+            }
+        },
+        "skipId": true
+    },
+    "$isNew": false,
+    "_doc": {
+        "_id": "6684d3ba71023a544053848d",
+        "products": [
+            "6681b2a648a715ca8c7112b7",
+            "6681b2b548a715ca8c7112ba"
+        ],
+        "userId": "6681b26748a715ca8c7112b2",
+        "fulfilled": false,
+        "createdAt": "2024-07-03T04:29:46.077Z",
+        "updatedAt": "2024-07-03T04:56:05.167Z",
+        "__v": 0
+    },
+    "products": [
+        {
+            "_id": "6681b2a648a715ca8c7112b7",
+            "userId": "6681b26748a715ca8c7112b2",
+            "name": "ccc",
+            "description": "cc",
+            "category": "Clothing",
+            "price": 34,
+            "brand": "dscsdc",
+            "quantity": 34,
+            "created": "2024-06-30T19:31:50.436Z",
+            "updated": "2024-06-30T19:31:50.436Z",
+            "__v": 0
+        },
+        {
+            "_id": "6681b2b548a715ca8c7112ba",
+            "userId": "6681b26748a715ca8c7112b2",
+            "name": "efef",
+            "description": "sdc",
+            "category": "Office Supply",
+            "price": 4,
+            "brand": "edd",
+            "quantity": 65,
+            "created": "2024-06-30T19:32:05.590Z",
+            "updated": "2024-06-30T19:32:05.590Z",
+            "__v": 0
+        }
+    ]
+}
+
+cart object returned gives us this, thus need to return cart.toJSON()  
+ 
+ JSON.parse(text)   //convert string to json obj
+ JSON.stringify(obj) // if(typeof obj.toJSON != "undefined" ) {convert  obj.toJSON to string} else {convert whole json obj to string}
+ obj.toJSON()
+
+userId: user._id.toJSON(),   //this gives number, else will give objectId type if user._id OR string(if JSON.stringify(user._id)(as call toJSON() but makes a string at the end)) 
+                                                                                           OR  objectId type if user.toJSON()._id
+
+
+https://stackoverflow.com/questions/20734894/difference-between-tojson-and-json-stringify
+Basically toJSON also gives a object only which has only important keys of the parent object
+
+And its return value can then be used by json.stringify instead of stringifying the whole object.
+Also without it, by default, json.stringify omits function keys etc
+
+
+1)obj.hasOwnProperty('fnName')  
+//just tell property with keyname is there not if the property is a fn but ok as var and fn cant be same name
+2)typeof obj.fnName != undefined &&  typeof obj.fnName === 'function'
+
+ 2 ways to check if an object has a function
+
+
+---------
+ add cart details to localstorage if not logged in, 
+       and retrieve from localstorage after login 
+----------
+import {message, Popconfirm, Model(inside Alert)} from "antd"
+----------
+Array.from(new Set(products))
+
+ onClick={addProductToCart} or onClick={() => addProductToCart(product)}
+
+ not  onClick={addProductToCart(product)}  as 1) immediately fires
+    2) fn fire means state change rerender, but then again immediately fires infinite loop 
+    3) on  onClick={addProductToCart} rerender modal is visible as 
+          visiable is useState thus stores info b/w renders  
+------------
+
+const ProtectedRoute = connect(mapStateToProps)
+     (({component: Component, auth, ...rest}) => {
+                        //accumulate other props in rest
+
+                                       //spread/destructure other props
+                                        // from rest 
+    return auth.isAuthenticated? <Component { ...{...rest, auth}}/> : 
+            <Navigate to={`/login${rest.location}`}/>
+
+});
+
+
+-------------
+
+urlparams, Link, Button, navigate, Navigate change url.
+    router, useLocation, useParams and rest components just read the url
+<route exact path= /> - this just checks the url and 
+            doesnt redirects but renders another subcomponent based on url
+              thus url query params same
+       and then can use the same url query params location.search to <Navigate/> to someplace else
+
+if(props.auth.isAuthenticated) {
+          //const split = location.search.split("redirect=");
+          //const redirect = split[split.length-1].split("&")[0]
+const redirect = new URLSearchParams(location.search).get("redirect"); 
+const hasRedirect = redirect.length > 0 && location.search.includes("redirect"); 
+
+message.success("Thank you for signing up");
+setTimeout(()=> navigate(hasRedirect? redirect: "/"), 3000 );
+}    
+-----------             
+ReactDom.render(component, reactmountNode);
+-----------
+
+each reducer must have different action.type are all are combined into one 
+cant have same ERRORS type in each reducer as may go to wrong reducer
+
+ IMP-
+also,
+  if(localStorage.token){
+    setAuthToken(localStorage.token);
+ } 
+ //need to set before each parallel dispatch
+ //as other dispatch are run in parallel in async thus it may not be set
+ ----------
+
+also need to remove back history on login/register as when we click back 
+ the login send data post req again like but still not able to completely authenticated
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+
+
+
+
+
+
+
+
+
+webhook (not like callback as in callback, code awaits)
+ server to listen to response/events after sometime from stripe 
+(rpc - actions, rest - objects)
+
+To enable webhook events, you need to register webhook endpoints. 
+After you register them, Stripe can push real-time event data to your application’s webhook endpoint when events happen in your Stripe account. 
+Stripe uses HTTPS to send webhook events to your app as a JSON payload that includes an Event object.
+
+customer.subscription.created and payment_intent.succeeded events.
+After your webhook endpoint receives the Event, your app can run backend actions 
+(for example, calling your shipping provider’s APIs to schedule a shipment
+ after you receive a payment_intent.succeeded event).
+
+express-
+app.post('/webhook', express.json({type: 'application/json'}), (request, response) => {
+  const event = request.body;
+ switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object;
+      // Then define and call a method to handle the successful payment intent.
+      // handlePaymentIntentSucceeded(paymentIntent);
+      break;
+    case 'payment_method.attached':
+      const paymentMethod = event.data.object;
+      // Then define and call a method to handle the successful attachment of a PaymentMethod.
+      // handlePaymentMethodAttached(paymentMethod);
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a response to acknowledge receipt of the event
+  response.json({received: true});
+
+
+
+test using stripe cli client(can also use postman)- 
+>stripe listen --events payment_intent.created,customer.created,payment_intent.succeeded,checkout.session.completed,payment_intent.payment_failed \
+  --forward-to localhost:4242/webhook
+
+
+stripe.api_key = 'sk_test_tR3PYbcVNZZ796tH88S4VQ2u'
+
+from django.http import HttpResponse
+endpoint_secret = 'whsec_...'
+
+# Using Django
+@csrf_exempt
+def my_webhook_view(request):
+  payload = request.body
+  sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+  event = None
+
+  try:
+    event = stripe.Webhook.construct_event(
+      payload, sig_header, endpoint_secret
+    )
+  except ValueError as e:
+    # Invalid payload
+    print('Error parsing payload: {}'.format(str(e)))
+    return HttpResponse(status=400)
+  except stripe.error.SignatureVerificationError as e:
+    # Invalid signature
+    print('Error verifying webhook signature: {}'.format(str(e)))
+    return HttpResponse(status=400)
+
+  # Handle the event
+  if event.type == 'payment_intent.succeeded':  
+
+ https://docs.stripe.com/payments/quickstart 
+
+--------------------------------
+
+server side rendering
+
+app.engine('.hbs', expressHandlebars({ extname: '.hbs' }));
+app.set('view engine', '.hbs');
+app.set('views', './views');
+
+app.get('/checkout', async (req, res) => {
+  const intent = // ... Fetch or create the PaymentIntent
+  res.render('checkout', { client_secret: intent.client_secret });
+});
+
+
+can use prebuilt stripe pages - 
+Checkout renders in an iframe that securely sends payment 
+information to Stripe over an HTTPS connection.
+
+or create our own custom page
+--------------
+
+Verify your business
+Business type
+Business details
+Public details
+2
+Add your bank
+3
+Secure your account
+4
+Add extras
+5
+Review and finish
+
+
+
+
+------------------
+
+
+
+
+
+
+CUSTOM PAYMENT PAGE
+
+subscription is just a modal/object in stripe, once payment is done, api call to create a subscription, and while buying etc. check if the subscription exists
+or create a subscription in server mongodb model after stripe payment is successful, but then need to redirect to payment page again once subscription endpoint_secret
+
+When operating in Stripe’s test mode, real payments are not processed through card networks or providers. 
+Instead, you get simulated accounts, payments, customers, charges, refunds, transfers, and subscriptions.
+
+payment_intent=pi_3PaFMyIPedPoXQNK1gHo2jQ0&payment_intent_client_secret=pi_3PaFMyIPedPoXQNK1gHo2jQ0_secret_ZnTc6IaegYBaGOdRHkHZNsPfh&redirect_status=succeeded
+
+    >1-2 between client->server-> stripe server and back (secret key and client secret)
+1)private api key server to perform actions on stripe server
+2)<App> mount, client to server call, server has secret key,create client_secret from stripe and get a client_secret 
+           (like session token types, dont use tokens anymore set on server localstorage, but client secret on url params as better, thus tell not to click back button
+      pass to child stripe component as porps , child stripe component renders again
+
+    >3-6 between our client and stripe (public key and client secret) [public key just extra security measure for client from stripe server side]
+3)public api key for client so stripe server knows that we are using proper client, also client_secret this is the client which has session with our server
+4) navigate to same component now but with params for client secret, 
+  ,doesnt run again as useEffect and mount also only once 
+  also pass client secret to stripe child component by wrapping and passing it in <Elements> provider(ike <Context.Provider> or Redux store connect)
+5)<PaymentElements> predefined component to get all card details etc, 
+        on submit button use stripe.confirmPayment(element(including client_secret and card data and public key) ) hook with redirect url.
+       
+6)and if by chance we go back in browser or also when redirected to new url, 
+    then on [stripe] hook change(stripe.confirmPayment changes this like store state)
+      useEffect()[stripe] runs again, (get the client_secret from url, doesnt need public key as just fetching info thus not that much security) 
+      and (api call to stripe server to get intent status) and show message 
+
+      When Stripe redirects the customer to the return_url, the payment_intent_client_secret query parameter is appended by Stripe.js. 
+      const clientSecret = new URLSearchParams(window.location.search).get(
+      "payment_intent_client_secret"
+    );
+      Use this to retrieve the PaymentIntent status update   stripe.retrievePaymentIntent(clientSecret) and determine what to show to your customer.
+
+    now our client knows that payment successful, but our server doesnt know that our payment is successful
+    >7 between stripe server and our server
+7)send response to a hook server endpoint from stripe server, so that our server when that api endpoint called from stripe server, based on the event=res.body.event can 
+   take action to create invoice/dispatch product accordingly . payment_intent.succeeded, payment_intent.processing, and payment_intent.payment_failed events.
+
+`IMP - 
+   Listen for these events rather than waiting on a callback from the client. 
+   On the client, the customer could close the browser window or quit the app before the callback executes, and malicious clients could manipulate the response.
+   meaning dont do :-
+            on return_url: `${getServer()}/confirmpayment` can go to server page to confirm payment successful instead for client page, 
+                and based on scccess payment_intent props in server rl make payment as succeed
+                or reditect to client page, and based on scccess payment_intent props in browser url, call post request/webhook success endpoint of server 
+         the call post request/webhook success endpoint of server should not be called from client after successful redirect callback from stripe, 
+         but  all post request/webhook success endpoint of server must be called from stripe server itself      
+
+    const {error} = await stripe.confirmPayment({
+    elements,
+    clientSecret,
+    confirmParams: {
+      return_url: "/",
+    },
+    // Uncomment below if you only want redirect for redirect-based payments
+    // redirect: "if_required",
+});
+
+
+
+-------------------------------------------------
+
+
+save card details- stripe only does, we only set flag from our server-> stripe server when we create payment intent
+ // Alternatively, set up a webhook to listen for the payment_intent.succeeded event
+  // and attach the PaymentMethod to a new Customer
+  const customer = await stripe.customers.create();
+
+  // Create a PaymentIntent with the order amount and currency
+  const paymentIntent = await stripe.paymentIntents.create({
+    customer: customer.id,
+    setup_future_usage: "off_session",
+    amount: calculateOrderAmount(items),
+    currency: "usd",
+    // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+    automatic_payment_methods: {
+      enabled: true,
+    },
+  });
+
+  Create a customer
+  settings
+  Stripe stores the card on a Customer object. Create a new Customer before creating a PaymentIntent. 
+  You can also store name, email, shipping address, and other details on the Customer.
+
+  const chargeCustomer = async (customerId) => {
+  // Lookup the payment methods available for the customer
+  const paymentMethods = await stripe.paymentMethods.list({
+    customer: customerId,
+    type: "card",
+  });
+  try {
+    // Charge the customer and payment method immediately
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 1099,
+      currency: "usd",
+      customer: customerId,
+      payment_method: paymentMethods.data[0].id,
+      off_session: true,
+      confirm: true,
+    });
+  } catch (err) {
+    // Error code will be authentication_required if authentication is needed
+    console.log("Error code is: ", err.code);
+    const paymentIntentRetrieved = await stripe.paymentIntents.retrieve(err.raw.payment_intent.id);
+    console.log("PI retrieved: ", paymentIntentRetrieved.id);
+  }
+};
+
+here our client just displays a small stripe child component plugin and it is hosted by us only, the frontend small component is a react component only in stripe library
+--------------------
+
+LET STRIPE HANDLE PAYMENT
+
+Specify URLs for success and cancel pages—make sure they’re publicly accessible so Stripe can redirect customers to them. 
+You can also handle both the success and canceled states with the same URL.
+
+1)client->server-> stripe create checkout session thats it
+
+app.post('/create-checkout-session', async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+        price: '{{PRICE_ID}}',
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    success_url: `${YOUR_DOMAIN}?success=true`,
+    cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+  });
+
+  res.redirect(303, session.url);
+});
+
+redirect client to stripe checkout session  page
+
+after payment, stripe redirects to success_url: `${YOUR_DOMAIN}?success=true` server/react client page whatever just specify port
+
+here stripe acts as both our hosted frontend client and stripe server. 
+and redirect to our client success_url later(or same url for sucess/failure with params in url for success/fail)
+
+
+7)here also listen to webhook event our server 
+
+
+
+
+
+
+
+-----------------------
+
+
+
+advantage of <script src=stripe.js/> instead of npm stripe library is that updates automatically available to us, disadv is slow startapp/ network
+npm stripe library, need to deploy again or us CI/CD
+but for payment, security updates, use script tag
+
+loadstript() loads a stripe async from npm module and creates stripe object and passs it to the <Elements> provider 
+                                (so that the object is same everywhere like state)
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+in server >npm i stripe
+in client,// > npm i react-stripe-checkout
+>npm i @stripe/react-stripe-js @stripe/stripe-js 
+
+
+const calculateOrderAmount = (items) => {
+  // Replace this constant with a calculation of the order's amount
+  // Calculate the order total on the server to prevent
+  // people from directly manipulating the amount on the client
+  return 1400;
+};
+---------------
+
+
+////////create a new payment page, protected component and naviage in App,  Link to it when clicking button in cart, 
+////////and onmount() get the cart state from redux action and store as local state, and if notlogin redirect to login page and to cart redirect props
+////but here showing as small component this will do
+-----------
+
+can easily refund payments from stripe as they just need to give money back to back again from our stripe account if not neft to our bank.
+also same card, can see other related payments
+ receipt url - https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUFp4ZjBFQWx1ckZWNGlDKNrFsLQGMgYRv2At1-06LBaeBxezerkrjPujku68XK6wP7FC61nqOcZJv8uE6dqK0z0d4tObHVIDNLg2
+ sample payment url - https://dashboard.stripe.com/test/payments/pi_3PaLR4EAlurFV4iC1H98LIBq
+
+ 
+  await elements.submit();  - validate form and get wallet info  //validates form(checks if form filled properly all fields etc.) and wallets if any
+              
+  if (error.type === "card_error" || error.type === "validation_error") {  //card delined, card number not proper etc
+      setMessage(error.message);
+
+The presentment of Apple Pay and Google Pay are dependent on the browser you're using meeting Stripe's prerequisites for those to be displayed. 
+The most common reason for those to not be displayed is that a card was not added to the associated wallet prior to the Payment Element being displayed. 
+To test Google Pay, you'll want to make sure you add a card to your Google Pay wallet. To test Apple Pay, you'll need to add a card to your Apple Pay wallet.
+
+4242 4242 4242 4242 - test visa card number stripe
+-------------------------------------------------
+
+
+7) on successful payment webhook of server called, update the quantity in backend 
+   and create a Payment obj in backend db to store payment info (cardId, userId, etc)
+
+    const customer = await stripe.customers.create(); //create customer before creating intent
+    // OR Alternatively, set up a webhook to listen for the payment_intent.succeeded event
+    // and attach the PaymentMethod to a new Customer
+    Stripe stores the card on a Customer object. Create a new Customer before creating a PaymentIntent. 
+    You can also store name, email, shipping address, and other details on the Customer.
+    
+
+  IMP -charge item automatically created. it also has 
+       1)customer_id details which was created(has email, name, address fields) during creation of payment intent. 
+       2)payment_intent_id = pi_3Pag8pEAlurFV4iC0UVzD0zQ  ;   
+              this is passed in webhook params also (payment intent obj also has payment_intent_client_secret, but no need to query payment_intent obj after webhook call)
+       3)(and metadata field stores tax_id etc)
+  
+
+
+  Q)how to retrieve this charge item after webhook call from payment_intent and payment_intent_client_secret params from server?
+  payment_intent=pi_3Pag8pEAlurFV4iC0UVzD0zQ&payment_intent_client_secret=pi_3Pag8pEAlurFV4iC0UVzD0zQ_secret_wSn8tkvo8Zp8EMKi95RxPDTif&redirect_status=succeeded
+
+  Ans) https://docs.stripe.com/webhooks/quickstart
+    The Webhooks tab will be renamed to Event Destinations: Send events to cloud environments, starting with Amazon EventBridge.
+     (we are using GCP not amazon so put GCP event endpoint)
+
+      express server listens to http://0.0.0.0:5000 but not my ip from my public ip as we are not open to public ip
+               >curl ifconfig.me   = https://167.103.21.14:5000/api/payment/confirmpayment
+
+     TEST - Listen to live Stripe events and forward them to your local device using the Stripe CLI., 
+      >brew install stripe/stripe-cli/stripe
+      >stripe login  
+      >stripe listen --forward-to localhost:5000/api/payment/confirmpayment --events payment_intent.succeeded --skip-verify   
+              //Forward events to your webhook http, get stripeEndpointSecret
+      means instead of hosted endpoint, adding a local listener using stripe cli, has its own stripeEndpointSecret (as it can forward the request to all the interfaces our server is listening on)
+   
+
+   CODE- 
+      //charge is created implicitely when payment intent is created and updated implicitely when payment intent is succeeded
+      
+      const signature = req.headers['stripe-signature']; //verify signature with endpoint secret, so that we know the webhook endpoint which forwarded to is correct
+
+        //window.location.payment_intent;    
+                //no need to check and retrieve payment intent from params in frontend as we get it from construct event object using POST req.body in server webhook
+        // const paymentIntentRetrieved = await stripe.paymentIntents.retrieve(err.raw.payment_intent.id);
+        // console.log("PI retrieved: ", paymentIntentRetrieved.id);
+
+         /paymentIntent also has customer id field from which we can retrieve customer and its details
+      const paymentIntent = event.data.object;   
+      const customer = await stripe.customers.retrieve(paymentIntent.customer);
+
+
+      return_url: `${getClientServer()}/`,    
+      //add a payment succcess display page and redirect to homepage like in swiggy,
+           even if close app in server webhook order placed and on open app on mount get new state from server and display
+
+        cant use window.location.payment_intent id from frontend as need again clientid for it from server to get payment intent if actually correct or not  
+        thus mostly server deals with stripe apis with stripe secret key. if by chance need some use to access stripe api from frontend for a particular use,
+        (like sendpayment/ confirmpayment then use clientkey which we got from server and then do)  
+
+      req.body on webhook for payment_intent.succeeded event   
+
+---------------------------
+
+  in network tab in browser, can see  requests are going from your browser to stripe.com - they don't touch your server, 
+      means req from frontend app server stripe module sends request to r.stripe.com etc. 
+  for fraud detection. thus we will never know if any fraudulent api call happening inside a package thus only install trusted modules.
+
+
+<img> tag in react, src= public url or my react hosted files in Public folder, calls normal get request to server http://localhost:3000/assets/images/eshop.jpg or to image src IP
+Thus make sure never to make frontend api route url similar to any file paths in Public folder.
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+
+flask - print('This is standard output', file=sys.stdout)
+express node - dont need this directly console.log()
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+for later - 
+https://himanshu-sheth.medium.com/jenkins-vs-travis-which-ci-cd-tool-is-best-for-you-754d67222ed1
+difference between builing in CI/CD and just runnings jobs to pull from github and rerun npx run scripts 
+
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/deployment - very big not needed, done
+
+IFrame vs CORS - done 
+- setup local git snow mac
+https://learning.postman.com/docs/getting-started/basics/about-postman-agent/ - done
+
+
+
+
+---------------------------------------------
+Express SERVER IP NETWORK
+
+
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/deployment
+
+
+The Webhooks tab will be renamed to Event Destinations: Send events to cloud environments, starting with Amazon EventBridge.
+  (we are using GCP not amazon so put GCP event endpoint)
+
+
+IMP
+  A)in client react side, axios,  can send request to and to send open to the world and to our server localhost and window.location.reload etc.  (IP=url IP/react IP same)
+                A2)(listen open to nothing(not true listens to IP=react IP same). only local navigate using react router that too just renders component not actually listens)
+  B) but in express in server side, listen to only localhost and till now not open to the world. (IP=server IP)
+                B2)(can send request to open world or even localhost i.e not to its another route also using axios or any other node library)
+
+
+
+  1)ABLE TO ACCESS IN WIFI LOCAL IP NOT PUBLIC IP AND PING WORKING AND 0.0.0.0 node-express server listening means that VPN blocking over Public IP interface, 
+    as wifi local interface working.  
+2) REACT BY DEFAULT CONFIGURES CLIENT TO LISTEN TO ALL INTERFACES. IN NODE EXPRESS SERVER HAVE OPTION TO CONFIGURE INTERFACE AS SENSITIVE DATA.
+    ONLY DIFFERENCE BETWEEN REACT FRONTEND SERVER AND NODE BACKEND SERVER IS 
+    2.1)REACT FRONTEND SERVER CAN RUN BROWSER JAVASCRIPT ALSO AND DO RENDERING AS FILES HOSTED AND RUNNNING ON BROWSER.
+    (eg MEANS CONSOLE.LOG IN REACT WE SEE ON BROWSER AND NOT ON REACT TERMINAL) (MONGODB IS CLOUD THUS REACT CAN ALSO ADD DATA TO MONGODB BUT NOT GOOD IDEA)
+    2.2) NODE EXPRESS RUNNING ON SERVER TERMINAL NOT BROWSER THUS CANT RUN RENDERING/BROWSER JAVASCRIPT COMMANDS like window.location etc.
+          BUT CAN RUN OS COMMANDS LIKE PATH, READ FILE,  ETC.              
+
+
+
+----------------------------------------------------------------
+Ans A) Local Firewall: Ensure that your local firewall (e.g., iptables on Linux or the Windows Firewall) is configured to allow incoming connections on the port you are using.
+        Cloud Provider Security Groups: If you are using a cloud provider (like AWS, Azure, or Google Cloud), make sure the security group or firewall rules 
+        are set to allow incoming traffic on the specified port from your public IP.
+
+        curl, telnet, or netcat from another machine to test if the port is open and reachable:
+        >telnet <your-public-ip> <port>
+
+        express server listens to http://127.0.0.1:5000 localhost,  
+          make it listen to my public IP or all interfaces http://0.0.0.0:5000  but not my ip from my public ip as we are not open to public ip
+            
+        get public IP-    
+        >curl ifconfig.me   =   167.103.21.14(gives public ip or VPN IP)       = https://167.103.21.14:5000/api/payment/confirmpayment
+        >ipconfig getifaddr en0  = 10.160.68.155(gives MY local wifi IP)
+
+       LOCALHOST IP:-
+            >curl http://127.0.0.1:5000/  -> on LOCALHOST IP calling get server request (this cmd work only if running on server where express is hosted)
+       LOCAL WIFI IP:-     
+            >curl http://10.160.68.155:5000/ -> on my LOCAL IP calling get server request (this cmd works from any laptop conneted with my same wifi router LAN
+                                                                   dont care if VPN ON or not as VPN is on different public interface not LAN interface eg. vedant laptop) 
+                        //VPN hides this ip, but if called to this ip, first goes to the VPN 167.103.21.14 IP and then VPN tunnels to my router 10.160.64.1 
+                               and router routes to my 10.160.68.155 IP. 
+                        //VPN while sending request just hides my IP from other govt ISP/servers when sending request thats it 
+                            and gives them VPN IP instead and receives on the VPN IP and tunnels back to my IP
+                            //but not working for me why? as VPN blocking
+            >curl http://192.168.0.1:5000/ -> on my PRIVATE IP calling get server request (this cmd works from any other LAN machine)(hotspot means our phone becomes outer)
+
+       ALL/ANY INTERFACE my IPs :-     
+            >curl http://0.0.0.0:5000/      -> on all interfaces for port 5000, 
+                     (interface vs ip? we have 2 ips public ip(public interface) and localhost ip(loopback interface). any other IPs also?)
+                     loopback IP address/interface meaning loop back from internet to the same machine. 
+
+
+        PUBLIC VPN IP :-  
+            >ping 167.103.21.14     -> able to ping means my laptop discoverable on this public ip
+                (as VPN forwards it to my router IP{167.103.21.240 on the vnet interface and 10.160.64.1 on the wifi interface} which forwards it to my local IP 10.160.68.155). 
+                           but the http  request not able to get response as my node server not able to receive request 
+
+               [laptop](NIC1){10.160.68.155} ----> (NIC1){router ip 10.160.64.1}[wifi router](NIC2){broker ip 167.103.21.240} -----------> (NIC2)[VPN router](NIC3){internet}  
+                   [laptop]{10.160.68.155}    <---------  my ip, VPN tell wifi router(167.103.21.240) to forward it to 10.160.68.155 <--{167.103.21.14}GET Internet
+
+              thus if ping is working and server listening on 0.0.0.0 means not interface or reaching computer issue. something else firewall/domain etc is the problem     
+
+            >curl http://167.103.21.14:5000/ -> on my PUBLIC  IP calling get server request (this cmd works from anywhere eg. stripe)  
+                      from chrome, not giving this site cant be reached as able to >ping thus able to reach server, 
+                       means vpn tunneling to wifi router and wifi router routing to me working fine,
+                     giving gateway timeout Server error - server 167.103.21.14 is unreachable at this moment. means able to reach but not getting response http
+
+        http://10.160.68.155:5000/api/confirmpayment
+
+     
+        const PORT = process.env.PORT || 5000; -> create env variable from .env file to be used by the application/process
+        const HOST = process.env.HOST || 0.0.0.0; ->(all interfaces loopback local ip and public ip)
+
+        Error: listen EADDRNOTAVAIL: address not available 167.103.21.14:5000 //using vpn thats why mayb
+
+        You should use 0.0.0.0:PORT to run the node js app and then bind this port to your private/public ip. For example in docker compose you should do it like this:
+        ports:
+          - "192.168.10.4:PORT:PORT"
+
+
+        1)ABLE TO ACCESS IN WIFI LOCAL IP NOT PUBLIC IP AND PING WORKING AND 0.0.0.0 node-express server listening means that VPN blocking over Public IP interface, 
+            as wifi local interface working.  
+        2) REACT BY DEFAULT CONFIGURES CLIENT TO LISTEN TO ALL INTERFACES. IN NODE EXPRESS SERVER HAVE OPTION TO CONFIGURE INTERFACE AS SENSITIVE DATA.
+           ONLY DIFFERENCE BETWEEN REACT FRONTEND SERVER AND NODE BACKEND SERVER IS 
+            2.1)REACT FRONTEND SERVER CAN RUN BROWSER JAVASCRIPT ALSO AND DO RENDERING AS FILES HOSTED AND RUNNNING ON BROWSER.
+            (eg MEANS CONSOLE.LOG IN REACT WE SEE ON BROWSER AND NOT ON REACT TERMINAL) (MONGODB IS CLOUD THUS REACT CAN ALSO ADD DATA TO MONGODB BUT NOT GOOD IDEA)
+            2.2) NODE EXPRESS RUNNING ON SERVER TERMINAL NOT BROWSER THUS CANT RUN RENDERING/BROWSER JAVASCRIPT COMMANDS like window.location etc.
+                 BUT CAN RUN OS COMMANDS LIKE PATH, READ FILE,  ETC.
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------
+Network Interface
+
+ >curl http://0.0.0.0:5000/      -> on all interfaces for port 5000, 
+                     loopback IP address/interface meaning loop back from internet to the same machine. 
+
+Q)interface vs ip? we have 2 ips -  public ip(public interface) and localhost ip(loopback interface). any other IPs also - yes as many network interface we have?
+Ans) on each interface, computer  we will have its own IP. eg private IP for LAN interface, public IP for Wifi interface, localhost IP for localhost interface.
+     when we put a request for an IP, NICs check which NIC interface it belongs to and then forward to the router of that interface
+     Although not required, a network interface is usually associated with a network adapter/NIC. For instance, the loopback interface has no network adapter associated with it. 
+     A machine must have one network adapter card/NIC for each network (not network type) to which it connects.
+              - if a host attaches to two token-ring networks, it must have two network adapter cards/NIC. 
+                         However, only one copy of the token-ring network interface software and one copy of the token-ring device driver is required.
+         
+
+      network interface on IP layer 3. The TCP(4)/IP(3) Network Interface layer formats IP datagrams at the Network layer into packets 
+      that specific network technologies can understand and transmit. The IP layer selects the appropriate network interface based on the destination address of the packet to be transmitted. 
+      Each network interface has a network address range.
+
+    The Ethernet(en eth0), 802.3(et wlan0), and token-ring(tr) interfaces are for use with local area networks (LANs).
+    The loopback interface(lo) is used by a host to send messages back to itself.(a network interface with only one IP/host and no router)
+     The Virtual IP Address(tun0) interface is not associated with any particular network adapter/NIC. Multiple instances of a virtual interface can be configured on a host. 
+       - When virtual interfaces are configured, the address of the first virtual interface becomes the source address unless an application has chosen a different interface.
+       - Processes that use a virtual IP address as their source address can send packets through any network interface that provides the best route for that destination.
+       - Incoming packets destined for a virtual IP address are delivered to the process regardless of the interface through which they arrive.
+
+    A network interface is a software representation of a physical(Represents actual hardware network adapters (e.g., eth0 for Ethernet, wlan0 for Wi-Fi).) 
+            or virtual network card(Represents software-defined interfaces (e.g., lo for loopback, tun0 for VPN tunnels).) 
+    that allows your computer to connect to a network. 
+    Common examples include eth0(ethernet), wlan0(wifi), lo(localhost), and virtual interfaces(vi/ tun0).   
+
+  interfaces are configured through network configuration files or using commands like ifconfig or ip.
+      IP addresses are configured on network interfaces. This can be done statically (manually) or dynamically using DHCP.
+
+  >netstat -v
+  To allow traffic from the IP address 192.168.1.100 to eth0 interface
+  >sudo iptables -A INPUT -i eth0 -s 192.168.1.100 -j ACCEPT    
+
+
+  iptables is a powerful command-line tool on Linux for configuring and managing the IP packet filtering and NAT (Network Address Translation) 
+  rules of the Linux kernel firewall. It operates at the network layer (Layer 3) and can control the traffic flow to, from, and through a Linux system.
+
+
+    thus app.listen(0.0.0.0) listen to all networking interfaces.
+         (means IPs assigned to it on all the interfaces, if routed to it by the interfaces successfully, listens to all those interfaces via their NIC on the specified port)
+
+
+   >ifconfig      
+      gives details of all network interfaces, their range, and NIC name and our IP in those interface like en0(wifi), lo, eth1(ethernet/LAN)
+   >netstat -tln   //-t means tcp, -l menas only on open ports on which listening, -n means list ip addresses as number and dont resolve into hostnames
+   tcp4       0      0  10.160.68.155.49855                           10.160.68.155.5000                            TIME_WAIT  
+
+   https://www.youtube.com/watch?v=PYTG7bvpvRI
+
+
+
+
+
+
+----------------------------------------------------------------   
+Public vs Local vs Private vs localhost IP       
+
+        Your public IP address is assigned by your Internet Service Provider (ISP) to your home network(router). - 10.160.68.155
+        Your local IP address is defined by your router, which assigns a unique local IP address to each device on your home network - 167.103.21.14
+
+        Private IP Address: Your router assigns private IP addresses to your devices via DHCP, such as 192.168.1.2 for your laptop and 192.168.1.3 for your smartphone.
+
+            //Dynamic Host Configuration Protocol (DHCP) is a client/server protocol that automatically provides an Internet Protocol (IP) host with its IP address and other 
+            //        related configuration information such as the subnet mask and default gateway, DNS server. DHCP is a network management protocol used to automate the process of configuring devices on IP networks, 
+            //            allowing them to use dynamic IP addresses instead of static ones. Operates at the application layer (Layer 7) of the OSI model.
+            //IPsec is a suite of protocols designed to secure Internet Protocol (IP) communications by authenticating and encrypting each IP packet in a communication session.
+            //Protocols Involved: AH (Authentication Header), ESP (Encapsulating Security Payload), and IKE (Internet Key Exchange).  Operates at the network layer (Layer 3) of the OSI model.
+
+        Your ISP assigns a public IP address to your router, such as 203.0.113.45. 
+             All devices on your home network share this public IP address when accessing the internet, thanks to NAT. Private IP addresses are translated to public IP addresses 
+             using Network Address Translation (NAT) when accessing the internet.
+
+             >curl http://10.160.64.1:5000/     //but this reverse NAT not possible as router doesnt know need to forward to which IP. 
+
+
+
+
+        When testing an API locally, you need to use the Postman Desktop Agent. 
+                     as postman local agent like local browser/local curl command can access localhost/local public url as they use the computers proxy settings
+          but not postman web as it is acccessing over internet. thus we need to configure proxy on the postman webapp
+        The Desktop Agent is an application that runs locally on your computer. It enables API requests to originate in your web browser 
+        but get routed through your local machine and network. This enables the Postman web app to bypass the CORS limitations of browsers.  
+
+        https://stackoverflow.com/questions/7155529/how-does-http-proxy-work
+        The browser (CLIENT) sends GET http://SERVER/path HTTP/1.1 to the PROXY
+        Now the PROXY will forward the actual request to the SERVER.
+        The SERVER will only see the PROXY as connection and answer to the PROXY just like to a CLIENT.
+        The PROXY receives the response and forwards it back to the CLIENT.
+        Proxies sometimes change/add content within the data stream for various purposes.
+        Some proxies for example include your real IP in a special HTTP HEADER(x-forwarded-for) which can be logged server-side, or intercepted in their scripts.
+
+        CLIENT <---> PROXY <---> SERVER
+
+        in network setting in mac check local ip(before VPN) and also firewall settings
+
+
+
+----------------------------------------
+DNS
+
+The DNS resolution of localhost to 127.0.0.1 or ::1 is handled by the hosts file on your machine (e.g., 
+    > cat /etc/hosts
+        localhost is used to configure the loopback interface
+        # when the system is booting.  Do not change this entry.
+        ##
+        127.0.0.1       localhost
+        255.255.255.255 broadcasthost
+        ::1             localhost
+
+
+
+
+
+
+-----------------------------------------
+Proxy
+
+        https://learning.postman.com/docs/getting-started/installation/proxy/#configuring-proxy-settings
+        https://focsec.com/blog/how-to-detect-proxy-users#:~:text=One%20way%20to%20detect%20proxy,are%20usually%20called%20%22transparent%22.
+        >curl http://127.0.0.1:9000/systemproxy-48711c83.pac   //check my proxy file in mac
+        Proxy servers will often add their special headers to the request, such as Forwarded or X-Forwarded-For , 
+        which can indicate that the request has been forwarded through a proxy.
+         Proxies that add such headers are usually called "transparent".
+
+-----------------------------------------
+CORS
+
+The Desktop Agent helps bypass these CORS limitations by acting as an intermediary between the browser and the target API. Here’s how it works:
+The Desktop Agent is installed and runs locally on your computer.
+When you use a web app (like Postman) that makes API requests, instead of sending these requests directly to the target API server, the requests are routed through the Desktop Agent.
+The Desktop Agent, running locally, intercepts these requests.
+The Desktop Agent makes the actual API requests from your local machine to the target API server.
+Since the requests are originating from your local machine, CORS restrictions imposed by the browser are bypassed.
+use - Developers can test APIs from postman webapp without modifying server configurations to allow cross-origin requests.
+
+
+CORS means server is listening at a origin1 = protocol://domain:port
+1)when we send a request from any other origin2 = other domain/ip or port etc to this server on this origin1, 
+       the server doesnt care and will send data to any origin2
+but the check will be from browser side. browser looks for 
+Access-Control-Allow-Credentials:true          /////for sending cookies
+Access-Control-Allow-Headers:Content-Type
+Access-Control-Allow-Origin:* 
+headers to see if the current browser IP from which it send request is in the list of Access-Control-Allow-Origin headers of response provided by server.
+if it is , the browser displays the information, else the browser blocks. 
+
+The CORS settings don’t cause the server to block requests from any clients.
+Instead, if the server responds with Access-Control-Allow-Origin: http://example.com to a client request from JavaScript code in a web app that’s not running at
+ http://example.com, then the browser blocks that JavaScript code from being able to access the response. You will be able to see the response in your browser devtools and examine it there.
+  But that does not mean the browser will expose the response to your client-side JavaScript code.
+
+
+host an origin both are for different things. origin signifies the address from the request was originated and host signifies to which address/uri the request was made to
+    //dont work
+    // console.log(req.header('origin'));
+    // console.log(req.get('Origin'));
+    // console.log(req.headers.referer);
+    // console.log(req.header('x-forwarded-for'));  
+    // console.log("abc");
+
+    console.log(req.socket.remoteAddress);
+    res.setHeader('Access-Control-Allow-Origin', 'www.example.com')
+
+OR
+ app.use(cors({ origin: ["http://localhost:9000", "https://origin2.com"] , methods: ['GET]}));  
+
+    MEANING - only allow http://localhost:9000", "https://origin2.com" to run GET methods on our server.
+
+
+ //cors({ origin: [ "https://origin2.com", "http://localhost:3000"],  methods: ['GET']}));      //can specifiy host as well as port 
+              // cors({origin: ["http://10.160.68.155:3000", "http://localhost:3000", "http://167.103.21.14:3000"], });   
+                    //allow only all interfaces of my frontend to connect with my backend(as react doenst implicitely uses the best interface like chrome browser) 
+                    //thus listen to all host interfaces available in my backend server machine, and allow all frontend interfaces to access my backend server cors.
+
+                    //not true. frontend listens to all interfaces and ips and return the bundlejs to browser using index.html returned and script defered src="frontendip/bundlejs"
+                    // then there is no interaction with the frontend ip once we get bundle js in browsers as single page application(spa) .
+                             //all the clicks, api calls the js runs in browser, 
+                             //only the navigation is also inside our browser only for spa(only the window url changes and new component rendered not actual get request), 
+                             //but if we reload again we get bundlejs 
+                    //and all axios backend/frontchannel request are through our browser ip only(our public ip not the browser page ip) to the backend server ip
+                    //thus cors to restrict any ip for backend, frontend react listens to all interfaces and all ips and the frontend code runs on their browser using their ip
+                    //we just get the bundle js
+
+
+
+https://www.youtube.com/watch?v=PNtFSVU-YTI
+https://stackoverflow.com/questions/19966707/cors-error-on-same-domain
+
+
+but using CORS() is better as is doesnt expose the header allowed IPs in network tab in chrome if fail 
+    rather than directly setting res.setHeader('Access-Control-Allow-Origin', 'www.example.com') as this tell hacker which all origins are allowed
+
+
+
+
+---
+in console - 
+async function getData() {
+  const url = "http://localhost:5000/";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    const json = await response.json();
+    console.log(json);
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+getData();
+
+when vedant calls, gets from his private IP - 10.160.73.12
+----
+
+2)without CORS Access-Control-Allow-Origin header, only if we send request from the exact same combo protocol://domain:port, it is allowed. 
+    Means the same express server sending request to itself(no other servers as only one server/process can listen to and send from a PORT for an IP). 
+      not even browser(as has my public ip?)
+
+
+
+/////////////////////////////////////////
+Q) why cant we do this check on server side? as server wont know from where the information is coming?
+ans) dont know as we dont want to handle those things in server side
+
+Q) what is IP when we use postman, normal browser(public ip? dont know as when net off still can send request, then it automatically switches interface?)
+3)      instead of react app
+ans)     3.1) //below is wrong
+            // (react app has its own IP client server listening,
+             // thus browser doesnt send request to backend server ip, react app server send request from its ip to backend server
+        //browser from any ip/interface available  just send request to react app from its IP to load page -----------> 
+          //and when some event happens/button is clicked, react app send the axios request to   --------------------->
+          //server ip from the react client server ip where it is listening.
+    --------------------------------------
+          So listening IP where react client server app OR express backend server it listens and sends response and the IP tracked when it sends req and gets res is same only.
+            as getting request and sending response vs sending request and getting response, same only, just request and response object names 
+            and some protocol functions code different(sending response vs sending request)    
+      )
+
+      When a server receives a request from a client, it can see the IP address of the client making the request. In the context of a React application using Axios,
+       the IP address that the server sees will be the IP address of the client device running the React application i.e the user's browser or machine, 
+             (but that origin will be atleast for me  where react app is listening only and react app listen origin and my browser same origin now but not general case)
+      but still server port is different for the browser url port(vedants accesses my frontend using http://hisprivateip:3000 
+                                          but after accessing his browser url becomes http://myprivateip:3000) i.e my react frontend port http://10.60.68.155:3000
+      
+      thus able to see CORS error for http://myprivateip:3000  when connecting to my backend express server http://myprivateip:5000.  
+
+
+      IMP - CONCLUSION
+        A)cors allowed in backend ip 10.160.68.155:5000 from only my frontend ip 10.160.68.155: 3000 only
+        B) cors allowed in frontend ip 10.160.68.155:3000 from any private IP.
+
+         1) vedant connected my frontend IP 10.160.68.155:3000 using his private IP 10.160.73.12 as my frontend cors IP allowed from anywhere.
+         2) and then backend server call to myprivateip:backendport  10.160.68.155:5000
+                  from react app loaded into his browser(all src files are loaded) uses using my frontend ip myprivateip:frontendport 10.160.68.155:3000
+                     and thus cors allowed backend as myprivateip:frontendport 10.160.68.155:3000 my react app IP and not his IP
+                                
+          3) fetch() console to backend server  myprivateip:backendport  10.160.68.155:5000,
+                      when vedant calls, then gets from his private IP - 10.160.73.12 and cors not allowed to myprivateip:backendport  10.160.68.155:5000 as now 
+                      using his IP
+
+
+         4) frontend allows cors to access from anywhere IPs or all that we want except blocked IPs, and  backend allows only my frontend IP to access,
+             thus vedant is able to call my frontend using his IP or page IP(his chrome tries all interfaces by itself to connec to my react frontend ip), 
+                   and then react uses my frontend IP(not his IP, whichever interface was used) 
+                    to call my backend IP(doesnt try all interfaces, whichever interface was used to connect to my frontend, 
+                    that frontend interface only uses to connect to my server backend and ping).
+
+          5) // cors({origin: ["http://10.160.68.155:5000", "http://localhost:5000", "http://167.103.21.14:3000"], });   
+              //allow only all interfaces of my frontend to connect with my backend(as react doenst implicitely uses the best interface like chrome browser) 
+              //thus listen to all host interfaces available in my backend server machine, and allow all frontend interfaces to access my backend server cors. 
+
+           6) react package.json
+              "scripts": {
+                "start": "set PORT=5000 && react-scripts start"
+              } 
+
+          7) all react code is visible to everyone . 
+             A)mostly axios/fetch the website frontend server IP(geeksforgeeks frontend ip/ myprivateip:3000) should be used. why in fetch
+              vedants IP used dont know. but in axios  react  myprivateip:3000 only used
+             B) in browser url vedants ip all interfaces used 
+
+      Q) confirm this in vedant laptop?
+
+      const getServer = ()=> {        //node-express server axios calls
+          return isDevelopment ? "http://localhost:5000" : "http://10.160.68.155:5000"; 
+                      //it will call this to get express backend server using axios in react  with 
+                        //1)my private ip as this on vedant browser url(if not react axios but console fetch() would have used this ip)  
+                                  //react hosted on my private ip(even if react loads completely on vedants browser)
+               
+            };
+    -----------------------------------------
+
+
+      3.2) postman/curl - postman desktop - The requests are sent locally from your laptop or workstation. 
+                                      The IPs used to send your requests are the ones of your internal network setup.
+
+       3.3) now the question is what IP does Postman desktop app/ curl/ browser use?
+         Ans) A)they try to use all interfaces that the machine is connected to (do ping first and check on which interface does the given server IP exist)
+                            (if unable to ping shows err conn refused error black page in chrome),
+              B) and when got the interface, send from the machine IP of that interface through that interface to the IP.
+                eg) in chrome, fetch(http://localhost:5000/) , in server console.log(req.socket.remoteAddress); shows chrome  IP of  http://localhost:5000/
+                    If the request is from the same machine (localhost), the server sees 127.0.0.1 or ::1.
+                    If the request is from a different machine on the same local network, the server sees the private IP address of the client.(as chrome using private interface)
+                    If the request is from a device over the internet, the server sees the public IP address of the client (or the client's router).(as chrome using public interface)
+
+                  thus chrome makes origin same for me thus not able to see CORS error on browser url reload. but when done from vedant laptop, 
+                      will be able to see CORS error as his origin is different 
+
+
+              C)but in browsers Console fetch() requests (not postman as postman doesnt have url, also not browsers url typing as these both go by B machanism), 
+                   for console fetch request send as if origin is the browser url (public url also) i.e server ip of first request.
+                   
+                first uses request method OPTIONS - dont know what that is  
+                and then does C part.   but public ip not working for me anyways so no use
+
+     ---------------
+             D) IMP - in C, just origin passsed as header is browser url, but accesses is like B only finds interface and then does, just instead of IP of the interface,
+                  uses the browser url as origin.
+              Request Method: OPTIONS
+              Remote Address: 127.0.0.1:5000  
+
+              finding interface and cors if applicable first before sending the request by an OPTION request after Ping before main request
+              The HTTP OPTIONS method is used to request information about the communication options available for the target resource. 
+
+              The response may include an Allow header indicating allowed HTTP methods on the resource, or various Cross Origin Resource Sharing headers.
+              It acts an access controlling method for CORS request. i.e preflight request.
+              as before DELETE/PUT mostly used as if in preflight/options request cors not allowed then wont execute that request
+
+
+                                  
+   note - even if CORS few domains specifid still same origin always allows.
+
+
+
+----------------------------------
+
+IFrame vs CORS - talk fromand to app(domain1) with iframe(domain2). app to iframe, problem of iframe code.
+     1)but iframe to app, need to allow CORS on our app/server for iframe domain to send requests to communicate iframe to app else browser will block. best way
+
+      2)or embed parent app as iframe inside the original iframe, and the app iframe communicates with the app using parent.parent and this time both app iframe and app
+      on same origin thus the browser allows.
+
+      3)or use document.domain = "common domain" in script tag in both the app and the iframe (but only works in domain and sub.domain, nto 2 different domaind domain1 and domain2)
+
+   embed resources from cross domain but cant call ajax/ axios(inside uses XMLHttpRequest only) /fetch rest request from cross domain
+   https://www.youtube.com/watch?v=CBzt5jidnEA
+
+app.get('/index.html', function(req, res) {
+   res.sendFile('index.html' , {root: path.join(__dirname, '.')});
+}   
+-----------------------------------------
+
+http://10.160.68.155:3000/    - server url
+http://10.160.68.155:5000/api/users  - client url , in index change getClientSServer and getServer fns
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+email verification react(cant use hook, or can, backeend stripe does polling only.  use polling)
+
+email verification, store state updated, thus prev page componentreceive props hook changes, thus do the needful update page, usenavigate etc.
+but new tab so new session no? yes. 
+thus polling the state(setInterval on componentmount) from backend using getCurrentUser() auth action gets changed state from server and which changes state in reducer and then componentreceive props 
+will run in prev tab also.  
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+configure http_proxy with my application gateway(zscalar router public ip) in postman(as reverse web to my host), stripe(as reverse web to my host) 
+                                                                              and dockerfile(virtualization os/container doesnt know about my proxy)
+
+
+https://suitabletech.com/support/helpcenter/errors-full-listing/1898-locating-proxy-server-ip-address-mac
+function FindProxyForURL(url, host)
+ {
+ /*  Zoom Exclusion as per https://status.zoom.us/incidents/k3d5tvyns31w */
+	// For subnet bypass we are using application bypass in app profile
+    if (dnsDomainIs(host, ".zoomapp.cloud") || shExpMatch(host, "zoomapp.cloud"))
+	return "PROXY 127.0.0.1:9000";
+
+	/* Traffic Intended to Physical Interface bypass Zscaler - AWS Workspace */
+
+	 if (shExpMatch(host, "skylight-cm.ap-northeast-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.ap-northeast-2.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.ap-south-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.ap-southeast-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.ap-southeast-2.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.ca-central-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.eu-central-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.eu-west-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.eu-west-2.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.sa-east-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.us-east-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.us-gov-west-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm.us-west-2.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm-fips.us-east-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm-fips.us-gov-west-1.amazonaws.com") ||
+			shExpMatch(host, "skylight-cm-fips.us-west-2.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.ap-northeast-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.ap-northeast-2.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.ap-south-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.ap-southeast-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.ap-southeast-2.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.ca-central-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.eu-central-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.eu-west-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.eu-west-2.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.sa-east-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.us-east-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.us-gov-west-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service.us-west-2.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service-fips.us-east-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service-fips.us-gov-west-1.amazonaws.com") ||
+			shExpMatch(host, "ws-broker-service-fips.us-west-2.amazonaws.com")  ||
+			shExpMatch(host, "skylight-client-ds.us-west-2.amazonaws.com") ||
+			shExpMatch(host, "connectivity.amazonworkspaces.com") ||
+           shExpMatch(host, "*.cm-fips.us-west-2.amazonaws.com"))
+            return "PROXY 127.0.0.1:9000";
+        
+    // DEFAULT RETURN
+    return "DIRECT";
+}
+
+ZScaler Internet Access proxies your Internet traffic and runs it through URL content filter lists. 
+above are url that dont go through zscalar.
+
+
+https://help.zscaler.com/zia/verifying-users-traffic-being-forwarded-zscaler-service#:~:text=To%20check%20if%20a%20user's,can%20use%20to%20check%20connectivity.
+https://ip.zscaler.com/?_gl=1*1dfwopj*_gcl_au*NDkxOTYyNTYzLjE3MjEyNDUyMTQ.*_ga*OTQwMTgyNzUwLjE3MjEyNDUyMTU.*_ga_10SPJ4YJL9*MTcyMTI0NTIxNS4xLjAuMTcyMTI0NTIxOC41Ny4wLjI3Mzk1MTM3MQ..
+Your request is arriving at this server from the IP address 167.103.21.14, port=27092  , REMOTE_ADDR, REMOTE_PORT
+The Zscaler proxy virtual IP is 167.103.18.129.
+The Zscaler hostname for this proxy appears to be zs3-hyd1-1e2-sme.
+The request is being received by the Zscaler Proxy from the IP address 122.15.150.97
+Your Gateway IP Address is 122.15.150.97(add this in callback hook stripe. but how to configure it to forward to my ip?) , HTTP_X_FORWARDED_FOR
+
+A proxy or proxies has been detected.
+IP address: 167.103.21.14
+The header: HTTP_X_FORWARDED_FOR is present with the value:122.15.150.97
+
+0	Your internal IP:	unknown	
+1	IP address seen:	122.15.150.97	India
+2	Your external IP:	167.103.21.14
+
+
+
+it's foremost a proxy. you can see it explained here: https://data-flair.training/blogs/proxy-server-and-its-working/
+you <---> PROXY <---> internet
+normally, that means there are no way for you to access the internet unless the proxy is there (workplaces will enforce this) so that the proxy can prevent unwanted traffic.
+the proxy would also act as the single facade for any incoming attacks or connections. so for example
+[my work PC] <----> PROXY <----> [My home PC]
+if i need to connect to my work PC i have to connect to the proxy first, authenticate and get access to my work PC (and the network there - VPN)
+
+
+proxy server - The IP address is hidden, but the  proxy owner can see the IP address of the  client.	
+vpn - The IP address is hidden completely.
+
+
+callback hook
+1) ssh tunneling
+On server2, create an SSH tunnel to the proxy server.
+  ssh -L server2_port:server1_ip:server1_port user@proxy_ip
+  ssh -L 22:122.15.150.97:22 user@167.103.21.14
+Once the tunnel is established, you can connect to server1 from server2 using the local_port.
+  ssh -p local_port user@localhost 
+  ssh -p 22 user@localhost  
+
+2) http proxy
+  curl -x http://proxy_ip:proxy_port http://server1_ip:server1_port
+
+Imagine a client makes a request to your server through two proxies:
+  Client IP: 192.0.2.1
+  Proxy 1 IP: 203.0.113.5
+  Proxy 2 IP: 203.0.113.10 (closest to your server) , port = 27092
+  remote_addr: 203.0.113.10 (IP of Proxy 2), port 27092
+  x-forwarded-for: 192.0.2.1, 203.0.113.5, 203.0.113.10
+
+
+export HTTP_PROXY=127.0.0.1:9000 - to bypass zscalar only for the particular terminal session. 
+                                      for permanent add to .zshenv/.zshrc but dont do as need to connect to servicenow
+export HTTPS_PROXY=127.0.0.1:9000
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+A)Frontchannel 2 types- http req with data in res.body 
+                      or navigate (with redirecturl in queryparams) and (in their frontend things/clicks happen with their server backchannel)
+                            and renavigate back(navigate again to redirect url) with data in queryparams
+
+B)
+ 1) a HTTP request with data in response from idp 
+- and using(res.body or urlparams token) in app frontend code( or set in browser storage) and then navigate to some other page with query params(or the other page uses the browser storage)
+
+ 2)or a navigate to other idp frontend page with redirecturl query param, the other page frontend code return navigates to former page  with token as queryparams
+- and using(res.body or urlparams token) in app frontend code( or set in browser storage) and then navigate to some other page with query params(or the other page uses the browser storage)
+
+
+backchannel- thus in backachannel everything happens via post/get api, not like frontchannel navigate get and queryparams
+we send post req from server to google url with the code= and client_secret=  in body  
+(post has body thus send in body)
+
+now understand how saml works with this model.
+
+
+
+
+
+
+----------------------------------------------------------------------------------------
+
+
+ajax is like http only but = js+xml 
+There may be some header differences, but the main behavior difference is on the client.
+When the browser makes a regular request as in window.location.href = "index.html", it clears the current window and loads the server response into the window.
+With an ajax request, the current window/document is unaffected and javascript code can examine the results of the request and do what it wants to with those results 
+(insert HTML dynamically into the page, parse JSON and use it the page logic, parse XML, etc...).
+The server doesn't do anything different - it's just in how the client treats the response from the two requests.
+Except that most Ajax clients send a X-Requested-With=XMLHttpRequest HTTP header to server no other difference
+
+
+XMLHttpRequest is a standard javascript object that allows you to make HTTP Requests from the browser in javascript.
+HttpRequest is a server side object that represents a request to the server.
+In summary - one works in the browser, the other in the web server. They also have completely different roles. XMLHttpRequest is for fetching web resources within the browser. HttpRequest represents an incoming request.
+-------
+
+
+
+
+WebSocket is bidirectional, a full-duplex protocol that is used in the same scenario of client-server communication,
+unlike HTTP it starts from ws:// or wss://. It is a stateful protocol
+
+HTTP/websocket/tls/ssl work on application layer 5.
+tcp/upd work on transport layer 4
+ping/dhcp/ipv4/ipv6 work on internet layer 3
+
+
+
+UDP for data streaming one way, okay if some data is lost but speed needed connection route same 
+websocket for 2 way connection, still on tcp.
+http and websocket both on tcp. 
+
+
+
+so in websocket,
+so client sends request for connection to server, server sends data back whenever and event is fired on server.
+like all chats. 
+
+1)thus need websockets as client doesnt need to (ask the server/polling) keep making http request to server for events.
+2)we can create a hook/eventsourceapi in client but this only works when client itself is a server, not a browser as browser can expose and listem to an endpoint.
+also want to listen only from particular host and need to establish connection whever we want. 
+in hooks can do cors so set host or start server again and again when need to listen but not good way. still even if so much hassle can only listen on 
+client-servers not on client-browsers
+but functionally still not an interaction between them, just driven by events.
+
+also server needs to send the event info to all the clients connected easily not by calling thier hooks one by one
+
+3)thus use websocket. send only headers once. same tcp connection to server is used when used to load page http. but client sends request with header 
+ only once to server to upgrade the connection to https. can see only one ws call in  network tab in chrome even if many chat msgs posted and got.
+ but in frames tab in network tab can see the different data being send and received.
+
+ but https secure and encrypt over every call is websocket that good? it is also encrypted first time when connection established and after that connection established 
+ thus in between can listen but still ok dont matter ? ans) it is secure using wss. like https
+
+ so when a client 1 posts a message to server uisng ws, the server save msg in db and broadcasts the msg(including client1) to all the client connected via ws.
+ 
+  ws works well with existing tech like restapis and oauth
+
+  clientside native:-
+  const socket = new WebSocket("ws://localhost:8000");
+  socket.onopen = (event) => {
+    socket.send("open");
+  }
+  socket.onmessage = (event) => {
+    console.log(event.data);
+  }
+
+  socketio - js library for manipulating websockets
+
+  clientside socketio:-
+  var socket = io("http://localhost:8000");
+  socket.on('connect;, ())=> {                      //abstraction of switch case over event.type
+    socket.emit('event_on_my_server', data="open");    //sends data to server
+  });
+  socket.on('my_custom_event', (data)=> {
+
+  });
+
+  server python - 
+  import { Server } from "socket.io";
+  const io = new Server(3000, {
+    // options
+  });
+
+  io.on("connection", (socket) => {
+    // ...
+  });
+
+  while(socket.conn) {
+    spcket.emit('event_type', josnobj/string); 
+  }
+
+
+  asynchronous servers generally dont have support for this.
+
+https://www.youtube.com/watch?v=8ARodQ4Wlf4
+
+-----------------------------------------------------
+
+
+>export HTTPS_PROXY=127.0.0.1:9000
+>unset HTTPS_PROXY
+Cypress looks at cafile first and then ca and uses the corresponding certificate(s) as a replacement for the CA. For example, to use the CA at /home/person/certs/ca.crt, add the following to your .npmrc:
+cafile=/home/person/certs/ca.crt
+If neither cafile nor ca are set, Cypress looks at the system environment variable NODE_EXTRA_CA_CERTS
+
+>npm install cypress -D
+>node_modules/.bin/cypress install
+>node_modules/.bin/cypress open
+
+
+IMP -
+1)able to npm install cypress -D with this
+>export HTTPS_PROXY=127.0.0.1:9000 
+2) able to node_modules/.bin/cypress install with this  
+>export NODE_EXTRA_CA_CERTS=/path/to/trusted/CA.pem
+
+https://stackoverflow.com/questions/23788564/npm-add-root-ca
+
+
+>npm run e2e  //e2e : "cypress open" in scripts in package.json
+
+cypress uses ws:localhost:port
+ws://127.0.0.1:64428/devtools/browser/f3cb27fa-ea4b-46f8-8c52-fc0af8b005b5
+ws is a simple to use, blazing fast, and thoroughly tested WebSocket client and server implementation.
+
+HTTP and WebSocket both are communication protocols used in client-server communication. 
+HTTP is unidirectional where the client sends the request and the server sends the response. 
+HTTP can run on top of any reliable connection-oriented protocol such as TCP, SCTP
+
+--------
+
+
+
+
+
+
+
+
+

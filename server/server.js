@@ -7,10 +7,8 @@ const HOST = process.env.HOST || '0.0.0.0'; //'127.0.0.1';//'0.0.0.0';//'167.103
 const connectDB = require("./config/db");
 
 
-app.use(cors());   //cors({ origin: [ "https://origin2.com", "http://localhost:3000"],  methods: ['GET']}));      //can specifiy host as well as port 
-              // cors({origin: ["http://10.160.68.155:3000", "http://localhost:3000", "http://167.103.21.14:3000"], });   
-                    //allow only all interfaces of my frontend to connect with my backend(as react doenst implicitely uses the best interface like chrome browser) 
-                    //thus listen to all host interfaces available in my backend server machine, and allow all frontend interfaces to access my backend server cors.
+app.use(cors());  
+
 
 app.use(morgan("dev")); 
 //connect to mongodb async

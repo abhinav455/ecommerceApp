@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.3",
     "morgan": "^1.10.0",
+    "node": "^20.16.0",
     "stripe": "^16.2.0"
   },
   "devDependencies": {

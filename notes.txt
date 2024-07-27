@@ -1,0 +1,1897 @@
+>node --v,> npm --v
+>node (like >python3) , console.log("abc")
+>clear
+>touch test.js
+>code test.js /vscode
+> node app.js
+
+module, property, import, var
+
+var {a, b} = require(""); {} - destructure in js
+
+
+-----------------------------
+
+node is single,threaded - handles I/O scalability and not computation scalability very well. -> read/write files and db access
+nodejs does not wait for a line to complete, skips to next line async. (java springboot multithreaded, waits sync)
+
+nodejs does async only 3 things - when interacting over network, over filesystem/db or using timeout fns. (as they are implemented as async function() {} way). 
+rest everything is sync mostly. just because they have callback doesnt mean are async,they are run in sync only.
+nodejs instead of callback, async await or promise to handle the delays that nodejs skips. same only just used to avoid callback hell/chaining.
+await only in async fns supported.
+we use await to make it run like synchronous and force it to sync. else javascript very fast and good since running running async
+
+async() means we want node to run a fn as as asynchronous process where it is invoked , but inside the fn, and await means inside needs to wait to run till finish like sync.
+where the fn is invoked, Execution continues. Only the insides of one async function are suspended until a promise is resolved.
+
+
+async function abc(){   await 1; console.log(2); await2; console.log(3)}; 
+
+function main(){
+  abc().then(console.log("4"));
+  console.log(1);    //A) abc() is run async. abc returns an unresolved promise for time being. next code statements are run. 
+                      //B) inside abc fn, the statemnts are now run in sync (async actually like and then .then(console.log(2); await2; console.log(3))).
+                      // awainitng 1. the event queue and thread is free for other tasks, but that code is blocked. 
+                      //C) after abc() inside is run in sync which is acutally async and callback/then, the abc() promise retuern value resolves and .then consolelog 4 is called.
+
+
+}
+
+async await is synctactic sugar to make inside fn async code look sync. 
+since callback/then inside fn, works as if sync code(but the event queue and thread is not blocaked inside for other tasks while awaiting/then()) . outside fn async only.
+await has an underlying yield that is responsible for returning the flow to the caller. 
+the thread keeps running that code and doesnt look at event/task queue untill it encounters a yield
+
+-mean where fn is called, async many fns.  inside fn async. and asyncs chained with then for sync. inside and in between those async we have sync.
+
+At some point the promise -- that was evaluated for the await -- will resolve.
+ This will put a microtask in a microtask queue. When the JavaScript engine has nothing more to do in the current task, 
+ it will consume the next event in the microtask queue (FIFO). As this microtask involves a resolved promise, 
+ it will restore the previous execution state of the async function and continue with whatever comes next after the await.
+
+The function may execute other await statements, with similar behaviour, although the function now no longer returns to where
+ it was originally called from (as that call was already processed with the first await), it merely returns leaving the call stack empty,
+  and leaves the JavaScript engine to process the microtask and task queues.
+
+
+
+As long as the code contained inside the async/await is non blocking it won't block, for example db calls, network calls, filesystem calls.
+
+But if the code contained inside async/await is blocking, then it will block the entire Node.js process, for example infinite loops, CPU intensive tasks like image processing, etc.
+
+In essence async/await is a language level wrapper around Promises so that the code can have a synchronous 'look and feel'
+there's no way to know with complete certainty whether code is non-blocking, but if it doesn't return a promise or provide a callback, there is a 100% chance that it is blocking
+There's a lot of misunderstanding about async/await because most folks think that async. means non-blocking, but this is only true as you've specified if the code executes in an alternate thread or makes use of system calls that do. Most code that you write yourself - like a for/loop that does something, will indeed block, even in an async/await function
+
+
+----------------------------------
+
+>npm init
+>npm install express --save
+>npm start
+>npm i express bcryptjs jsonwebtoken mongoose express-validator --save
+>nodemon
+
+express app is a fn, but it extends from interface and has other fns, namespace, interface
+thus the fn can be ussed as callback for node.http or node.htttps objects
+
+
+port 8080 as tomcats in java run on 8080 by default
+process.env.PORT - gcp etc cloud resources have port variable and we dont override it, use that
+
+>npm install -g nodemon or npm install --save-dev nodemon //nodemon as a development dependency
+npm is a package manager. can use yarn instead.
+>npx nodemon //local install, cant call directly global, use npx, or create npm start npm script in that run nodemon
+
+
+
+--------------------------
+local database setup using mongodb, and in cloud setup using atlas. //as in local, we need to host and provide network security, access etc create own server.
+Once your database is up and running, live migrate an existing MongoDB database into Atlas with our Live Migration Service
+
+atlas can be hosted on axure,gcp,aws in mogodb gives option
+
+mongodb first admin user - pass - nJcjCVCSS0ZLFrCz , user- bhattacharjeeabhinav
+connection method - mongodb driver for node -> npm install mongodb. >
+//2)can also directly use terminal with mongodb command but this is shell commands not javascript/node -  brew install mongosh
+//>mongosh "mongodb+srv://cluster0.8yzwhzn.mongodb.net/" --apiVersion 1 --username bhattacharjeeabhinav
+//3) they also provide separate mogodb shell
+
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = "mongodb+srv://bhattacharjeeabhinav:nJcjCVCSS0ZLFrCz@cluster0.8yzwhzn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+                                                //<password>.8yw
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+
+
+mongoose is a framework to connect,define{documents and collections},create and manage mongodb database, implemented in other environments like node.
+nosql as client and browser data passed as json docs., as whole web is javascript and json, thus need db built around that
+object modelling in nodejs with mongoose
+
+make sure only IP address of our hosted backend server can connect to mongodb atlas
+
+Both connect and createConnection take a mongodb:// URI, or the parameters host, database, port, options. createConnection if more than 1 db
+
+
+--------------------------
+connectDB().then((returnvalue) => { ;});      //fn run async, then inside fn run many async one after another like sync/then, after first await yield inside fn below code run , 
+                                              //then again go back inside fn or do other jobs, after first await resolve go to other async/await inside in sync/then, 
+                                              //at end come back here then() with a resolved return value of fn/promise and run the inside then
+
+
+
+few fns definitions can be overloaded with synchronous and asynchorous depending on invoking. 
+if invoking using callback, then, await then async version is called else sync version is called like jwt.sign()/bcrypt.hash()
+-----------------------
+app.use("/api/users", require("./routes/userApi"));
+ //middleware. //no next fn thus doesnt go anywhere else when req is called to this path. this retured response is returned back to the caller
+
+http://localhost:5000/api/users //path is after port and not after localhost as localhost in the network layer, 5000 is tcp/ip layer, then rest of the paths are application layers, nothing to do with internet
+
+
+
+when we want to update more than one models information , like users and products together, not good via rest /users/123/products/23, used rpc style post actions, /addproduct_user_relo {product:123, user:456}
+and use variables to map states and /user/123/updatestate {state:running}  instead of /user/123/start,/user/123/stop etc.
+also use rpc herealso, /updatestate {user:123, state:running} but state part of usermodel thus can use rest only
+
+-------------------------
+schema definition, models are constructors compiled on schema, instance of model is document
+documents make a collection
+
+const User = mongoose.model() //name of model and mongoose.Schema
+app.use(express.json({extended: false})); //calls next implicitely inside
+app.use(morgan("dev")); //logging api calls in server
+app.use(express.static('public'));
+-------------------
+
+The five parameters — exports, require, module, __filename, __dirname are available inside each module in Node. 
+
+we used mongoose.connect first in one file and required, and used required mongoose.model and used model.findOne in another file.
+ but the require in different files uses same loaded module i think so same mongoose connected module, model is used.
+You're overcomplicating it. Node.js modules are only loaded once and then cached for reuse if they are requireed multiple times in a program.
+so unless we changed the required module in a file, it will stay same for all the files later when code runs and uses that module
+
+
+
+in-memory shared class instances. thus create new instances of the module/class using () if we dont want shared
+
+console.log(user); //displays a unresolved promise if not await in async fn
+
+
+--------------
+const errors = validationResult(req); //gets the check value result stored
+
+bcrypt, stored hash = cost factor+ base64(salt) + base64(bcrypt2fn(password+salt)*2^cost factor).     
+                                                        //bcrypt2fn is like md5(non linear fns/xor operations b/w registers) without salt/cost factor.
+                                                        //sha256 is same as md5, 1)just 256 o/p instead of 128 o/p(or each register size=128*4=512 in md5)  (each register = 256 bit ABCDE)
+                                                        // 2) steps similar, just one extra register in sha256 to increase bit size to 256 and non linear fns may differ thats it
+                ////////// steps md5 or sha256 or bcrypt2fn - 1)string = 512,512,512,... . 
+                            2)ABCD registers of 128 bit each(512 bit total) prev 128 result bit add to next 512 bit process register B.
+                            3) for[i] each 512 bit=16lots of 32 bit, for[j] 4 rounds, pick 128bit=4lot of 32 bit = sieof(A=B=C=D) and store in B.
+                             4)non liner fn B,C,D. add A(128bit) . add constant. shift.  store in B and go to next round.
+while compareing or attacker, decode salt, get cost factor,   and with the actual password generate the hash and compare. 
+the attacker just cant use precomputed rainbow table attackes as need to create hash rainbow table again for all the (common passwords+salt). and on top of this cost factor, thus take time.
+effectively all this salt(need to generate rainbow table again) and cost factor(2^n times) just to make it slow, else rest is like md5.
+
+
+----------------
+const privateKey = await fs.readFile('private.key');
+cosnt older_token = await jwt.sign({ foo: 'bar', iat: Math.floor(Date.now() / 1000) - 30 }, private_key, { algorithm: 'RS256' , expiresIn: '1h'});  //if iat not gives, passed current date-time implicitely
+const decoded = jwt.verify(token,privateKey);  //verify decodes the secret string to get hash and uses iat,expiresIn and also algorithm keys to create newhash and verify. thus jwt.verify uses the extra information like bcrypt.compare uses the extra cost and salt information from encoded bcrypt/jwt hashed string
+can use bcrypt instead of sha256 for jwt also it jwt would have supported
+
+jwt.io is just a decoder of bse64 jwt token with frontend
+
+ jwt.sign(
+                payload, //user id is stored in token)
+
+1)signup - bcrypt.hash and save password, jwt.sign() and return token
+   before every request non signin/signup request use auth middleware
+  2.1)  if called with token, jwt.verify, get userid from payload and action (eg return user details)
+  2.2) if no token , signin with password and bcrypt.verify and jwt.sign() and return token again
+
+---------------
+
+
+
+
+
+
+
+
+
+
+----------------
+
+packages and extensions
+
+1)package - ESLint statically analyzes your code to quickly find problems. It is built into most text editors and you can run ESLint as part of your continuous integration pipeline
+npm init @eslint/config assumes you have a package.json file already. If you don’t, make sure to run npm init or yarn init beforehand.
+After that, you can run ESLint on any file or directory like this:
+>npx eslint yourfile.js , add this line to npm start to whole folder eslint
+>node ./node_modules/.bin/eslint yourfile.js
+After running npm init @eslint/config, you’ll have an eslint.config.js (or eslint.config.mjs) file in your directory. In it, you’ll see some rules configured like this:
+// eslint.config.js
+export default [
+    {
+        rules: {
+            "no-unused-vars": "error",
+            "no-undef": "error"
+        }
+    }
+];
+
+The names "no-unused-vars" and "no-undef" are the names of rules in ESLint. The first value is the error level of the rule and can be one of these values:
+"off" or 0 - turn the rule off
+"warn" or 1 - turn the rule on as a warning (doesn’t affect exit code)
+"error" or 2 - turn the rule on as an error (exit code will be 1)
+configure eslint in only dev environment using >npm install --save-dev eslint
+
+
+2) extension - prettier install, and in setting select default formatter for javascript code to prettier. earlier used default javascript/typescript ecma formatter of vscode
+               vscode does >node prettier --filename=filepath.js , when we click format document in vscode. thus extension are like packages only. 
+                        and inside prettier code readfileSync(fileparam) etc.
+3) package - Babel is a free and open-source JavaScript transcompiler that is mainly used to convert ECMAScript 2015+ code into backwards-compatible JavaScript code 
+             that can be run by older JavaScript engines.
+                  A)Transform syntax
+                  B)Polyfill features that are missing in your target environment (through a third-party polyfill such as core-js)
+                      if (!Array.prototype.includes) {
+                          Array.prototype.includes = () => {} // Polyfill code goes here
+                        }
+                      To load the polyfill script, you can use a <script> tag in your HTML file. 
+                      <script src="path-to-polyfill.js/core-js"> </script>
+
+                      <img src="data:image/png;base64, iVBORw0=="/> or <img src="pathto.jpg" />
+                      same with link of fontawesome
+
+                      Link to an external polyfill file or include the code directly on the page.
+                      Adds new functionality to existing environment - Adding fetch() support to older browsers, 
+                      Active during runtime
+
+                      can also import You can import only-required-for-you polyfills,. Available CommonJS entry points for all polyfilled methods / constructors and namespaces. 
+                      >npm install --save core-js@3.37.1
+                      import "core-js";
+
+<script src="path-to-polyfill.js"> </script>  
+                  C)Source code transformations (codemods)
+                         Source code transformations are a more general term that refers to any change made to the source code of a program. This can include anything from simple changes to the formatting of the code to more complex changes that involve adding or removing features.
+                          Transpiling is a specific type of source code transformation that involves converting code from one high level programming language to another hih level. This is often done to make code compatible with a different platform
+                          unlike compiling which is high level to machine coding.
+                          Use the transpiler's command-line interface to transpile your code. 
+                          
+                          >npx babel input.js --out-file output.js
+                          Link the transpiled code (output file) in your HTML, just like you would with any other script. 
+                          <script src="output.js"></script>
+                          Adjusts syntax and structure for new version - Converting ES6 JavaScript to ES5 for browsers, 
+                          Pre-processes code before runtime execution
+                          https://www.naukri.com/code360/library/difference-between-polyfilling-and-transpiling
+      
+
+
+
+
+By default, Node.js treats JavaScript code as CommonJS modules.
+CommonJS was primarily intended for server-side development with Node.js. It implemented 
+synchronous loading using require and module.exports.
+but browers needed asynchronous loading.
+Then came the ES modules, which provide a native module system 
+for both client and server-side JavaScript with async loading support.
+On the other hand, library authors can also simply enable ES modules in a Node.js package 
+by changing the file extensions from .js to .mjs.
+Another way to enable ES modules in your project can be by adding a "type: module" field inside the nearest package.json file
+
+
+Alternatively, you can install and set up a transpiler like Babel to compile your ES module syntax down to CommonJS syntax. 
+Projects like React and Vue support ES modules because they use Babel under the hood to compile the code.
+All browsers support ES(ES6 to ES5 also babel does) but old nodejs server dont so need babel there.
+
+
+
+
+
+      D)React, JSX support via babel for all javascript and browsers. JSX->js.  Thus babel is a dependency package of react installed with react in package-lock.json and node_modules 
+      
+         also for old browsers babel does jsES6-> jsES5 thus good only.
+      usage - 
+         install :- npm install --save-dev @babel/preset-react
+         use:-    1) config file - babel.config.json - {
+                                                          "presets": ["@babel/preset-react"],
+                                                          "env": {
+                                                            "development": {
+                                                              "presets": [["@babel/preset-react", { "development": true }]]
+                                                            }
+                                                          }
+                                                        }
+                                   babel.config.js -  
+                                                        module.exports = {
+                                                          presets: [
+                                                            [
+                                                              "@babel/preset-react",
+                                                              {
+                                                                development: process.env.BABEL_ENV === "development",
+                                                              },
+                                                            ],
+                                                          ],
+                                                        };                    
+                  2)cmd >babel --presets @babel/preset-react script.js
+                  3)node api - require("@babel/core").transformSync("code", {
+                                    presets: ["@babel/preset-react"],
+                                });
+         JSX and React are two separate things. They’re often used together, but you can use them independently of each other. 
+         JSX is a syntax extension, while React is a JavaScript library.  
+         JSX is a syntax extension for JavaScript that lets you write HTML-like markup inside a JavaScript file.                      
+         in React, logic and markup-content live together in the same place—components. 
+         camelCase attributes as JSX turns into JavaScript and attributes <tag attr= value /> written in JSX become keys of JavaScript objects. 
+              instead of stroke-width you use strokeWidth. Since class is a reserved word, in React you write className instead 
+         const name = 'Josh Perez';
+          const element = <h1>Hello, {name}</h1>;
+          You can put any valid JavaScript expression inside the curly braces in JSX {}. wrapping JSX in parentheses() to avoid the pitfalls of automatic semicolon insertion in js.
+          After compilation, JSX expressions become regular JavaScript function calls and evaluate to JavaScript objects.
+                  This means that you can use JSX inside of if statements and for loops, assign it to variables, accept it as arguments, and return it from functions:
+
+
+      codepen.io
+       a)JS(babel) index.js- 
+          function formatName(user) {
+            return user.firstName + ' ' + user.lastName;
+          }
+
+          const user = {
+            firstName: 'Harper',
+            lastName: 'Perez'
+          };
+
+          const element = (
+            <h1>
+              Hello, {formatName(user)}!
+            </h1>
+          );
+
+          const root = ReactDOM.createRoot(document.getElementById('root'));
+          root.render(element);
+       a)HTML index.html-
+            <div id="root">
+              <!-- This div's content will be managed by React. -->
+            </div>   
+
+        JSX Prevents Injection Attacks
+          By default, React DOM escapes any values embedded in JSX before rendering them. 
+          Thus it ensures that you can never inject anything that’s not explicitly written in your application. 
+          Everything is converted to a string before being rendered. This helps prevent XSS (cross-site-scripting) attacks.
+
+        JSX Represents Objects.   JSX-babel transpile-> js -react-> json obj -> dom render
+           Babel compiles JSX down to React.createElement() pure javascript function calls.
+           const element = ( <h1 className="greeting">  Hello, world! </h1>);  - is same as -
+           const element = React.createElement(
+                               'h1',
+                                {className: 'greeting'},
+                                'Hello, world!'
+                              );
+
+          React.createElement() performs a few checks to help you write bug-free code but essentially it creates an json object from pure javascript function like this:
+          const element = {
+                            type: 'h1',
+                            props: {
+                              className: 'greeting',
+                              children: 'Hello, world!'
+                            }
+                          }; 
+
+         React DOM 
+          Unlike browser DOM elements, React elements are plain objects, and are cheap to create. React DOM takes care of updating the DOM to match the React elements.                
+          To render a React element, first pass the DOM element to ReactDOM.createRoot(), then pass the React element to root.render():
+          const root = ReactDOM.createRoot(
+            document.getElementById('root')
+          );
+          const element = <h1>Hello, world</h1>;
+          root.render(element);
+
+          react elements immutable.  It calls root.render() every second from a setInterval() callback.
+          In practice, most React apps only call root.render() once and inside subrendering when state changes. 
+          how such code gets encapsulated into stateful components.
+
+          React DOM compares the element and its children to the previous one, and only applies the DOM updates necessary to bring the DOM to the desired state.      
+          You can verify by inspecting the last example with the browser tools: thinking about how the UI should look at any given moment, rather than how to change it over time
+
+
+          import { Link } from "react-router-dom"; //JSX
+          instead of <a> tag, have <Link> tags JSX. 
+          (which is converted to js by babel and json by react and rendered as html by reactDOM)
+
+          also we cant see DOM created by react in devtools
+          as created by react DOM and not by browser DOM. react DOM adds the DOM element to DOM created by browser.
+          Thus need reacttools extension in browser to see and interact with DOM created by reactDOM.
+          
+          >npm i react-devtools >node ./node_modules/react-devtools >npx react-devtools
+              Then connect your website by adding the following <script> tag to the beginning of your website’s <head>: (before rectDOM <div id="root"> is loaded)
+              <script src="http://localhost:8097"></script>  
+               when we run react-devtools, it listens on port 8097 with express and return the .js file in response on get-req to make react-devtools available on browser
+                  (if react-devtools down or connect fails then no problem <script> tag just handles/catches the error and executes nothing)
+                need to enable it to accept and respond to incoming requests in company firewall. enable the extension for http/https:localhost:3000   
+
+
+-------
+      finally in frontend, like backend, react framework/module is a package of npm/yarn package manager for node environment/engine for javascript language. 
+                  react framework jsx to js formatted using babel. can use babel for polyfill and transpile source code to old js code.
+              in backend, express framework/module is a package of npm/yarn package manager for node environment/engine for javascript language. 
+                   can use babel for polyfill and transpile source code to old js code.
+      django framework/module with pip package manager in python environment/engine was used in avaamo as ml/ai logic was needed in python language,
+        thus couple that code with django server code easily. 
+        and mongodb drivers/mongoose or django-mongoose module/framework for mongodb in python environment there so no problem with db handling in django server python code also.
+------------------------
+
+
+
+
+
+
+
+
+
+
+------------------------
+
+
+react
+react framework is also a javascript node client framework and also runs on node and uses npm package manager
+server- >npm init
+        >node server.js 
+    ,or >npm start and in package.json "start":"node server.js" , goes in node_modules and runs node module which runs server.js in node environment
+    ,or >npx node server.js ,goes in node_modules and runs node module which runs server.js in node environment
+
+client- >npx create-react-app my-app  //node ./node_modules/.bin/create-react-app my-app
+              //npm init in backend. for intiilizing package.json etc
+        >node ./node_modules/.bin/react-scripts start  //runs index.js by default
+    ,or >npm start and in package.json "start":"react-scripts start"  ,which in turns goes in node_modules by default if doesnt find in current directory
+                                                                                                  and runs react-scripts module in node environment
+    ,or >npx react-scripts start ,which in turns goes in node_modules by default if doesnt find in current directory, if not then install from web the executable just to execute once                                          
+                                                                                                   and runs react-scripts module in node environment 
+add ./node_modules/.bin to your $PATH and NPX is not needed, use node only directly. but npx uses executable from web also if not available locally
+
+react uses 3000 port by default
+
+to manage states can use redux or contextAPI Both
+npm i redux redux-thunk react-redux lodash react-router-dom
+
+react-router-dom -> Browserrouter etc., <Link>
+react-redux -> <Provider>
+redux -> configureStore()
+
+
+--------------------------
+
+
+
+state :-    props is info/args that is passed to component. state is local info/local variable of the component.
+   function Clock(props) { <h2>It is {props.date.toLocaleTimeString()}.</h2> ;} 
+
+   root.render(<Clock date={new Date()} />);  Ideally we want to write this once and have the Clock update itself: root.render(<Clock />);
+   To implement this, we need to add “state” to the Clock component. State is similar to props of the fn , but it is private and fully controlled by the component.
+
+  they moved from fn to class as they needed local state variable(like static states between instances) and constructor for state and single instance of class used everytime. 
+  but later moved back to fn using hooks. (as hooks makes state like static doesnt get initialised and changed when each time render fn-component instance create)
+  also each fn-component objs points to new instance , more like class objs, less like fn objs which point to same instance address.
+  class -> Thanks to the setState() call, React knows the state has changed, and calls the render() method again. componentDidMount(), componentWillUnmount() lifecycle method
+
+   
+   A component may choose to pass its state down as props to its child components:
+
+   Because this.props and this.state may be updated asynchronously, you should not rely on their values for calculating the next state.
+   this.setState((state, props) => ({
+                                    counter: state.counter + props.increment
+                                  }));
+
+
+  Function -> Neither parent nor child components can know if a certain component(parent/child) is stateful or stateless, and they shouldn’t care whether it is defined as a function or a class. 
+   1)need state as fn/class obj Local variables don’t persist between renders. -> need to Retain the data between renders.
+   2)Changes to local variables won’t trigger renders.                         -> need to Trigger React to render the component with new data (re-rendering).
+
+
+
+
+
+   hook-
+   The useState Hook provides those two things:- like a Global Fn with its local fn variable and local fn setState.
+      A state variable to retain the data between renders.
+      A state setter function to update the variable and trigger React to render the component again. 
+      const [index, setIndex] = useState(0);             //let index = 0;
+      setIndex(5);
+      useState = (value) => {  
+                        let state = value; 
+                        return [state, (newVal)=> {state = newVal; React.render();} ];  
+                    }
+
+      const [movie, setMovie] = useState({name: "abc", likes:0 });
+      setMovie((m) => { return {..m, like: like+1};} );
+      useState = (value) => {  
+                  let state = value; 
+                  return [state, (S | newFN)=>  dispatch({type:GENERICSETSTATE},S|newFN )];
+                                 //{newFN(); React.render();} ];  
+                    }
+
+      //thus setState definition takes into account if a vairable or fn obj is passed.
+      useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] (+1 overload)
+      ///state returned is deepcopy but after render again useState called and value changed of state to intial value and new instance of usestate obj? 
+      ///no then how are hooks implemented?  
+
+   
+    Hooks—functions starting with use—can only be called at the top level of your components or your own Hooks. 
+    You can’t call Hooks inside conditions, loops, or other nested functions.
+    
+    State is local to a component instance on the screen. In other words, if you render the same component twice, each copy will have completely isolated state! 
+    <div> <component1/> <component1/> </div> . these 2 component1 instance have 2 different states. 
+    even though it is fn component and should point to same fn obj but doesnt as react fn still like class obj only while rendering mayb?
+    Q) What if you wanted both gallaries to keep their states in sync?
+    The right way to do it in React is to remove state from child components and add it to their closest shared parent and pass it down as props/ContextAPi.
+    But we have better was of using Redux.
+
+    useComponent() hooks only if context api using to get passed states as props in child component fns. here we are using Redux <Provider> and connect() and not ContextApi thus will dont need this.
+    only use hooks useState() and useEffect()(if need to write own hooks) with Redux.
+
+    custom hooks - in earlier props/contextApi method, we have a common parent state list, but each state is mapped to one component only not shared. same with redux earlier
+       only shared with parent and children states. not with siblings. 
+            but cant we just pass as props the same state element to both child component will it not work?? Ans) works and this the way 
+       but only one state element can be shared with multiple siblings components using custom hooks.
+          wrong. custom hooks for sharing logic(states will be different), props/context api/redux for sharing states b/w parent/child or siblings.
+
+           Custom Hooks let you share stateful logic, not state itself. two states for both the components will be different instance.
+            When you need to share the state itself between multiple components/siblings , lift it up to parent and pass it down instead like props/context api/redux.
+
+
+
+
+    useEffect- for events like, keeps running all the time, only when exit application it returns and remove the event listeners.
+       network connection has accidentally gone off. component needs to be synchronized with the network status. need two things in your component:
+          1)A piece of state that tracks whether the network is online.
+          2)An Effect that subscribes to the global online and offline events, and updates that state.   
+
+          More importantly, the code inside them describes what they want to do (use the online status!) rather than how to do it (by subscribing to the browser events).
+
+          //custom hook
+          import { useState, useEffect } from 'react';
+          export function useOnlineStatus() {
+            const [isOnline, setIsOnline] = useState(true);
+            function setValonline(val) {setIsOnline(val);}
+            useEffect(() => {
+              function handleOnline() {setIsOnline(true);}   
+                                             //setIsOnline((state, val)=> {return {..state , state.val: val};}) //can pass custom fns also if state if obj and need manipulation
+              function handleOffline() {setIsOnline(false);}
+              window.addEventListener('online', handleOnline);
+              window.addEventListener('offline', handleOffline);
+              return () => {
+                window.removeEventListener('online', handleOnline);
+                window.removeEventListener('offline', handleOffline);
+              };
+            }, []);
+            return {isOnline, setValonline};
+          }  
+
+          //invoke
+          import { useOnlineStatus } from './useOnlineStatus.js';
+          function StatusBar() {
+            const {isOnline, satValonline} = useOnlineStatus();
+            return <h1>{isOnline ? '✅ Online' : '❌ Disconnected'}</h1>;
+          }
+          function SaveButton() {
+            const isOnline = useOnlineStatus();
+            function handleSaveClick() {
+              console.log('✅ Progress saved');
+            }
+            return (<button disabled={!isOnline} onClick={handleSaveClick}> {isOnline ? 'Save progress' : 'Reconnecting...'} </button> );
+          }
+          export default function App() {return (<><SaveButton /><StatusBar /></>);
+          }
+
+        Only Hooks(useNAME fns return state, setState) and fn components(return) can call other Hooks!. (not normal classes/fns)
+
+        you’re taking the return value of one Hook: pass it as an input to another Hook:
+        export default function ChatRoom({ roomId }) {
+        const [serverUrl, setServerUrl] = useState('https://localhost:1234');
+
+        useChatRoom({
+          roomId: roomId,
+          serverUrl: serverUrl
+        });
+
+        Every time your ChatRoom component re-renders, it passes the latest roomId and serverUrl to your Hook. 
+        This is why your Effect re-connects to the chat whenever their values are different after a re-render. 
+
+        https://react.dev/learn/reusing-logic-with-custom-hooks
+
+
+
+        class Navbaqr can extend route if class components. 
+          how do functional components extend?  ans) cant do directly. create your own Hooks OR use HOC(higher order component fns framework)
+          https://stackoverflow.com/questions/68002650/extend-functional-components-in-reactjs   
+           
+
+    useEffect
+    import React, { useState, useEffect } from 'react';
+    function Example() {
+      const [count, setCount] = useState(0);
+      // Similar to componentDidMount and componentDidUpdate and componentWillUnmount:
+      useEffect(() => { // Update the document title using the browser API
+        document.title = `You clicked ${count} times`;});
+
+      return ( <div>
+          <p>You clicked {count} times</p>
+          <button onClick={() => setCount(count + 1)}> Click me </button></div>);
+        }
+
+      whenever state changed, component rerenders in setState in Dispatch,
+      but useEffect so that component remembers what action to 
+       take after state is changed and component rerenders
+
+      By using this Hook, you tell React that your component needs to do 
+      something after render. React will remember the function you passed (we’ll refer to it as our “effect”), 
+      and call it later after performing the DOM updates. 
+
+      return function cleanup () {} //fn runs like when componentDidUnmount
+
+
+
+--------------------------
+redux
+
+
+normal - every component has its own state but not available globally or in parent components, uses ids and useState.
+props - state available in all parent right from App component and passed down with each component, and update state in App component using hooks. 
+    so whole list of components need to be rendered right from parent as parent is changing. 
+    can fix this using react memo(component/fn) and useCallback() hooks etc so that other sibling compnents is cached and not rendered again is proprs passed are the same
+    also everything need to pass down lot of code 
+context - works similar to props, just the code is at toplevel and inside provider while parent is wrapped and can access states via useContext. just like synctactic sugar for props.
+        here also in order to prevent all sibling components from loading again use react memo(wrap single component definition here) 
+        thus if propes same will take from memo. but if fns are props, then each time new fn created, thus  the fns define as useCallback(fn()=>{}) hooks class for fns and pass so that they are same also like props and wont render again.
+
+redux - get slices of actions functions. looks like we are mutating state but behind the scenes mutating in immutable way like normal {...m, like: m.like+1}
+        redux connect fn already does preoptimize for us
+https://www.youtube.com/watch?v=-nZIMVOtK1g      
+
+
+1)reducer function receives state and action object and decides how to update state and returns new state. (state,action) => newState
+   reducer like event handler, action is different types of events  
+2)action is plain js object, like event that describes/stores info about something that happened or what to do. has a mandatory type field/key.
+3)redux state lives in object called store. store is created by passing in a reducer, and has a method called getState to get current state. 
+       (reducer in store when passed with current state and action returns new state depending on action)
+       also has dispatch(action) - to dispacth an action, 
+       subscribe(fn () {to do when any state changes}) 
+               - when any action is dispatched to the store and reducer of store changes state of store, thus method is invoked which invokes this passed fn.
+                   instead of printing again and again.
+
+
+
+        let initalState = {
+          counter: 0,
+        };
+
+        function counterReducer(state= initialState, action){
+          if(action.type === "increment") return {counter: state.counter+1 + action.payload;};   // newState = {...this.getState(), ...this.reducer(this.getState(), action)};
+          else if(action.type === "decrement") return {counter: state.counter-1 + action.payload;};     
+          else return state;
+        } 
+
+        const store = createStore(counterReducer);
+
+        console.log(store.getState());
+        store.subscribe(() => {
+          console.log(`store is changed and state is ${store.getState()}`);  
+                                                    // subscribe = (callbackfn) => { let callback = callbackfn;} //callback if a fn variable which is a fn variable.
+        });
+
+        store.dispatch({
+          type:"increment",
+          payload: 5,
+        });
+        store.dispatch({
+          type:"decrement",
+          payload: 10,
+        });
+
+    //reducer returns new state changes keys as obj,  
+   this.dispatch = (action, S |newFN) => { state = { S| newFN(), ...this.reducer(S|newFN(), action)};
+                               //this.setState({...this.getState(), ...this.reducer(this.getState(), action)});
+                                  this.subscribe.callback();
+                                   React.render();
+                                }      
+        // useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] (+1 overload)
+           //setState calls Dispatch, Dispatch handles setting of state and not vice versa.
+
+
+        const {
+          actions: { like, dislike },                // instead of   like = (payload) => store.dispatch({type : "like" , payload : payload});  
+          reducer,
+        } = createSlice({
+          name: 'movies',
+          initialState: movieList,
+          reducers: {
+            like: (state, action) => {
+              state[action.payload].likes += 1;    //state is a list of movies. payload is the id of the movie.  movies[id].likes +=1; 
+                                                     // instead of [...movies.slice(0, index), { ...movie, likes: movie.likes + value }, ...movies.slice(index + 1)];
+            },
+            dislike: (state, action) => {
+              state[action.payload].likes -= 1;
+            },
+          },
+        });
+
+        const store = configureStore({ reducer }); 
+
+        //connect in nav
+        const mapStateNav = (state) => ({
+          topMovieName: state.reduce((max, current) => (current.likes > max.likes ? current : max), state[0]).name,
+          totalLikes: state.reduce((accumulator, movie) => accumulator + movie.likes, 0),
+        });
+
+        //connect in movie
+        const mapDispatch = { like, dislike };
+        const mapStateMovie = (state, props) => ({ movie: state[props.id] });
+
+
+        const App = () => (
+          <>
+          <Provider store={store}>
+            <Nav />
+            <Body />
+          </>
+          </Provider>
+        );
+
+        //same
+        const Movies = () => {
+          const [movieIds] = useState(movieList.map((movie) => movie.id));
+          return (
+            <div>
+              <h2>Movies</h2>
+              <div className="movie-list">
+                {movieIds.map((id) => (
+                  <Movie key={id} id={id} />
+                ))}
+              </div>
+            </div>
+          );
+        };
+
+
+        const Movie = connect(           //using connect as this helps to keep like,dislike instance same, and only the movie that is changed is rendered by redux
+          mapStateMovie,
+          mapDispatch
+        )(({ movie, like, dislike }) => (
+          <div className="movie-item">
+            <div>{movie.name}</div>
+            <div>{movie.likes}</div>
+            <div>
+              <button onClick={() => like(movie.id)}>
+
+        ));
+        
+
+        connect() works like useState() for components. thus return objects of connect are states
+        [counter,setCounter]= useState((state, props) => ({
+                                    counter: state.counter + props.increment
+                                  }));                                   
+        OR const mapstateprops_to_counter =    (state, props) => ({
+                                    counter: state.counter + props.increment
+                                  });
+           const fncomponent = connect(mapstateprops_to_counter)({counter}) => { return ();}; 
+
+        NOTE: here state passed to useState() or mapstateprops_to_counter/connect() is
+                the complete state of the store passed in the rootparent component.
+              and useState() or mapstateprops_to_counter/connect() only takes relevant information 
+              from state of the store and maps it to local state "counter" of the child component                                                   
+
+
+         https://github.com/redhwannacef/youtube-tutorials/commit/d301ce20daf6280b763b9c454519cea1c900b794     
+-----------------------------------
+
+
+
+
+----
+... - spread to make shallow copy
+
+    const obj2 = { c: 3, d: 4 };
+    const obj3 = { ...obj1, ...obj2 };
+
+    const arr = [1, 2, 3];
+    const sum = (...args) => {return args.reduce((a, b) => a + b, 0);}; //array.reduce
+    console.log(sum(...arr)); // 6
+    const obj = { a: 1, b: 2 };
+    const log = ({ a, b }) => console.log(a, b);
+    log(...obj);
+
+---
+  fns as objects - Try checking sayHi.prototype object in devtools. every fn object point to the same single fn instance unlike class which can have many objects.
+          function sayHi() {
+              var score=12;
+              console.log("Hi! the score is " +score);
+          }
+          sayHi.newProp='hello';
+
+          /*Create a new pointer pointing to the same object*/
+          var obj=sayHi;
+          console.log(obj.newProp);
+
+          //var score=12 is a local variable while newProp='hello' is a property added to same fn instance, both pointer point to same fn instance. 
+                     instance there till a fn pointer is pointing to it maybe.
+
+    c++ fn objs and ptrs:-
+    int multiply(int a, int b) { return a * b; }
+
+    void print(int (*funcptr)(int,int))
+    {
+        cout << "The value of the product is: " << funcptr(2,3)
+            << endl;
+    }
+ 
+    int main()
+    {
+        int (*func)(int, int);
+    
+        // func is pointing to the multiplyTwoValues function
+    
+        func = multiply;
+    
+        int prod = func(15, 2);
+        cout << "The value of the product is: " << prod << endl;
+        cout<< print(multiply) << endl;
+    
+        return 0;
+    }   
+
+    error in catch will throw an error and will stop the execution of program. 
+    error thrown in try block will be catched by its subsequent catch blocks 
+    but if error occur in catch block ,
+    then you need to write a separate try catch block in order to catch it.                   
+-------------------    
+
+
+Since Babel 7 the Babel team switched to scoped packages, so you now have to use @babel/core instead of babel-core.
+But in essence, @babel/core is just a newer version of babel-core.
+This is done to make a better distinction which packages are official and which are third-party.
+If a package's name begins with @, then it is a scoped package. The scope is everything in between the @ and the slash
+@scope/project-name. 
+The code of all those dependencies is under @scope directory. packages with @ denotes the organisation. In this case the organisation is Fortawesome.
+------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------
+mern proj
+
+will creade reducer for users, products etc., then go into actions
+import rootReducer from "./reducers"; - automatically takes index.js if no file mentioned
+thunk middleware helps to provide some functionality to our actions
+in actions earlier would return action objects, but now with thunk  we can return fns.
+    const store = configureStore({
+        reducer,
+        middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),  
+            //redux thunk added automatically //logger middleware applied now
+        devTools: process.env.NODE_ENV !== 'production',
+        preloadedState,
+        enhancers: (getDefaultEnhancers) =>
+          getDefaultEnhancers({
+            autoBatch: false,
+          }).concat(batchedSubscribe(debounceNotify)),
+      })
+
+   compose(f, g, h) is identical to doing (...args) => f(g(h(...args))).
+
+
+  redux calls combine reducers automatically
+   const store = configureStore({
+            reducer: {
+              posts: postsReducer,
+              comments: commentsReducer
+            }
+          })
+     You can still call combineReducers() yourself if 
+     you need to construct the root reducer manually first.
+
+
+in store, const initialState = {}; 
+//here initial state empty as when we combine reducers, each reducer will come with its own state
+
+store.dispatch(setCurrentUser(user)); 
+  //setCurrentUser converts to type and payload action json, passed to reducer 
+     and reducer based on type sets state with action payload in custom way depending on action type
+-----------------------------------------
+
+>npm i axios
+axios module to connect with backend secured send restapi calls
+promise based http client(as send request like client to server). 
+make XMLHttpRequest from node.js. (to node.js server or any server rest call)
+
+like express module/framework is http server. 
+[app =express(); app.listen(port, ()=>{}); app.use("path",express.router()); app.get("path", (req,res)=> {});]
+
+
+try{
+    const res = axios.post("localhost/api/users", userData, config); 
+        //signup with username,email and pass, brcypt.hash, jwt.sign with jwtSecret and return token in response
+    //call like store.dispatch(setCurrentUser(user)); 
+    //why dont we just return action from here for reducer to use, dispatch already called by store  no?
+    //as store calls register action, we register here and dispatch another action to reducer based on result. but dont need dispatch again just return the action json no?
+    dispatch({
+        type: SUCCESSFUL_REGISTER,
+        payload: res.data,
+    });
+} catch(err){
+    const error = err.response.data.errors;   //errors from server
+    dispatch({
+        type: SUCCESSFUL_REGISTER,
+        payload: res.data,
+    });
+}
+
+
+localStorage.setItem("token", action.payload.token);  
+   localStorage of browsers, normal JS fn by mozilla mdn who developed js.
+axios.defaults.headers.common["x-auth-token"] = token;
+    //again, works as same instance of axios module loaded in multiple files
+
+localStorage.setSession()
+const isDevelopment = window.location.hostname.includes("localhost");
+-------------------------------------------
+
+Redux Thunk, action vs reducer work
+
+our actions fns will do the js logic and async api call to backend and pass json payload from server to reducer.
+reducer just updates the state and rerenders component in frontend.
+
+    getState to get current state of store
+
+    const setCurrentUser = user => async (dispatch, getState) => {
+        if(localStorage.token){  
+          if(getstate() == 1)
+            dispatch({type: ,payload: });
+          else dispatch({type: ,payload: });   
+        }
+    }         
+
+    able to use dispatch as using redux-thunk. 
+    Redux Thunk is a middleware that allows you to write action creators that return a function instead of an action object. 
+    The function can then be used to dispatch multiple actions, or to dispatch actions after some asynchronous operation has completed. 
+    The function that is returned by an action creator will be called with two arguments: the dispatch function and the getState function. 
+    The dispatch function can be used to dispatch actions, and the getState function can be used to get the current state of the store.
+
+
+---------------------------------------------
+
+
+
+
+-----------
+
+<script src="pathto polyfill.js file in client/core-js .js file httpweb path"> </script>
+<img src="data:image/png;base64, iVBORw0=="/> or <img src="pathto .jpg file in client or httpweb path to .jpg file" />
+
+same with link of fontawesome
+<link rel="stylesheet" href="pathto .css file in client or httpweb path to .css file">
+rel="stylesheet" - means adding to index.css file. 
+(like <script src=/> adds to index.js file and <img scr=/> add to index.html file itself) 
+
+implicit link in index.html - <link rel="stylesheet" href="./index.css" />
+
+<script src="https://kit.fontawesome.com/8da67118bc.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+can use any one of above two.
+
+cdnjs are CDN service on cloudfare CDN servers, they provide libraries/modules for our use via net, 
+instead of installing open source files locally in client , we can href or src to them to get the code in <link> or <script>.
+and will be fast as CDN also along with server.
+has all frontend libraries like react/vue/angular and 
+     3rd party(may or maynot have official support with main packages)  frontend packages like fontawesome,bootstrap
+     thus dont need to write any code for example to upload image in client, just add the plugin code from cdnjs.
+
+
+similar is unsplash.com for images src(.jpg) like fontawesome for .css and cdnjs for anything .css/js.
+   can download and pathto .jpg local file, or pathto httpweb .jpg in unsplash.com
+<img src= "https://freestocks.org/fs/wp-content/uploads/2023/09/old_vintage_party_line_telephone_at_a_flea_market-1024x683.jpg" width="50" height="60">
+<img src= "https://images.unsplash.com/photo-1718049719548-f5cea9f78592?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width="50" height="60">
+
+
+
+thus in frontend, you have js logic for normal logic and  work with backend, 
+     and also js logic for frontend display js/css/html logic.
+---------------------------
+
+
+react/redux plugin for vscode ES7 with babel support
+type - "rafc" to create a new react functional component
+------------------------
+
+select sentence and  cmd+D to select and cmd+D keep clicking to change all
+---------
+
+<nav className = "main-navbar bg-main">  
+        //can take .css of parent App component also as DOM renders as single file all css and html 
+
+import { Link } from "react-router-dom";
+<Link> need to use inside <Router>, 
+as <Router> will know where to route when <Link to="path"> is clicked that is how the module is created
+
+/* Landing Page */
+.landing {
+  background: url("/assets/images/eshop.jpg")
+
+import {BrowserRouter as Router, Route, Routes, Link} from "react-router-dom";
+<Router>
+  <nav> 
+   <Link to="/about">About</Link>
+  </nav>
+
+  <Routes>
+     <Route path="/about>
+       <About/>
+     </Route>
+     <Route>   ....
+  </Routes>
+</Router>
+
+load and render specific components when clicked specific routes, 
+using JSX manipulation and call render(), new JSX and json passed to reactDOM to render
+
+
+JS Brower DOM functions
+  <Route exact path="/" element= {<Background/>}/> -> window.location.href  //.hostname etc
+  The window.location object can be used to get the current page address (URL) and to redirect the browser to a new page. 
+  window.location.href, .hostname, .pathname, .protocol(http: or https:), .assign() loads a new document/redirect
+
+In react-router-dom v6, "Switch" is replaced by routes "Routes". You also need to update the Route declaration 
+from <Route path="/" component={Home} /> to <Route path='/' element={<Home/>} />
+
+
+<Provider> from react redux in html/jsx to use store inside those components
+
+variables and js in {} in JSX
+
+
+------------
+.css can make more specific like 
+.main-navbar a{} 
+.main-navbar a:hover {}
+
+
+in path, "/path" means from directory where it runs node(package.json) absolute, and "./path" means from the path of file in which we have this code
+
+Overlay components-
+  the z-index property specifies the stack order of an element. An element with greater stack order is always in front of an element with a lower stack order.
+  Note: z-index only works on positioned elements (position: absolute, position: relative, position: fixed, or position: sticky) and flex items (elements that are direct children of display:flex elements).
+  Note: If two positioned elements overlap without a z-index specified, the element positioned last in the HTML code will be shown on top. 
+
+  another way - making your parent component relative (position: relative) and the children component absolute (position: absolute/fixed ; top:50vh).
+                Then you can position the children element with the values: *top, left, bottom and right
+
+
+.main-navbar {   position: fixed; z-index: 1;}
+.landing {/* margin-top: 6.3%; */ position: relative;}
+
+
+antDesign framework like bootstrap plugins/web .js/.css for frontend.
+>npm i antd
+
+import "antd/dist/reset.css"; or
+import {message} from "antd";
+
+------------
+
+
+
+
+---------------------------------
+const mapStateToProps = (state) => ({
+    auth: state.auth,
+})
+//map state of store to local props of child component 
+       //behaves like local state only as if props changes then also re-render happens
+  mapStoreStateToLocalProps should be better name
+
+connect(mapStateToProps, {register}) ((props)=> {return (jsx);});
+
+access uisng props.auth and props.register
+
+means inside the Register functional component get local state like 
+      [register] = useState(register);
+      [auth] = useState((state) => ({
+    auth: state.auth,
+}));
+
+register calls dispatch thus it needs to be passed like a state/hook
+
+----------------
+
+
+function Foo() {
+  const handleClick = function(){  // OR function handleclick(){}
+    // use function statements to avoid creating new instances on every render
+         // like in class when you use `bind` to this or arrow functions(bad as creates new instance on every render)
+    console.log('memoizing can lead to more work!')
+  };
+  return <Button onClick={handleClick}>Click Me</Button>;
+}
+   https://stackoverflow.com/questions/53215067/how-can-i-bind-function-with-hooks-in-react
+
+
+----------------
+
+
+//reducer returns new state changes keys as obj,  
+   1) this.dispatch = (actionjson, null | S |newFN) => { state = { ...state, null |S| newFN(), ...this.reducer(actionjson)};
+                               //this.setState({...this.getState(), ...this.reducer(this.getState(), action)});
+                                  this.subscribe.callback();
+                                   React.render();
+                                }      
+        // useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] (+1 overload)
+           //setState calls Dispatch, Dispatch handles setting of state and not vice versa.
+
+    const [movie, setMovie] = useState({name: "abc", likes:0 });
+      setMovie((m) => { return {..m, like: like+1};} );
+     2) useState = (value) => {  
+                  let state = value; 
+                  return [state, (S | newFN)=>  dispatch({type:GENERICSETSTATE},S|newFN )];
+                                 //{newFN(); React.render();} ];  
+                    }
+
+      //thus setState definition takes into account if a vairable or fn obj is passed.
+      useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>] (+1 overload)
+
+
+IMP
+store.dispatch(actionjson, null|S|newFN);
+
+
+1)inside actionFN()
+    invokes store.dispatch(actionjson, null);
+
+       like inside register(userData), invokes store.dispatch({
+                                        type: SUCCESSFUL_REGISTER,
+                                        payload: res.data,          
+                                    }, null);
+
+       or      setcurrentuser(user)
+
+    actionFN(args) -> dispatch(actionjson, null)
+    setState(S|newFN()) -> dispatch(actionjson= {type:GENERICSETSTATE},S|newFN )
+
+2) like setState(S|newFN()), 
+    invokes store.dispatch(actionjson= {type:GENERICSETSTATE},S|newFN )
+
+thus dispatch is the baseline fn
+
+
+
+
+async function  onSubmit() {
+  const newUser = {
+      name, 
+      email,
+      password,
+  };    
+  
+  if(password === password2){
+      await props.register(newUser)(Provider.dispatch);   //no need to write like this as redux-thunk handles this
+
+--------------------------------
+
+devTools
+html - Elements tab
+css - elements / (styles,computed,layout) tab
+js - sources/page tab, elements/(properties, event listeners, dom breakpoints) tab
+
+console - console tab
+application/storage - localStorage variable that in given by JS/(React in "react")
+          localStorage.setItem("lastname", "Smith");
+           localStorage.getItem("lastname"); - JS
+
+          setSession(), cookie
+   storage/local storage/ url/   {token: "sdcd"}
+
+
+
+network - Network tab, url, http, code, headers, body, time 
+          window.location - JS
+          <Route exact path = "">
+          <Link to="">
+          axios.setHeader() / req.getHeaders() / res.json()
+          axos/express/router.post("/path", (req,res)=> {})          
+          useLocation, useNavigate, useParams hook React-Node
+
+security tab - ssl/tls certificate, CA, public key etc
+
+
+
+react devTools
+component tree we can see
+all the props passed to the componenet and current value we can see
+   connect() comes here as passes store state as component props
+all the hooks(state comes here as =useState, useEffect, useRef, useLocation) 
+     comes here and current value we can see 
+---------------------------------
+
+npm i cros
+middleware app.use()
+----------
+
+useEffect 
+
+
+React state updates are asynchronous, i.e. queued up for the next render, so the log 
+is displaying the state value from the current render cycle. 
+You can use an effect to log the value when it updates. 
+This way you log the same state.value as is being rendered,
+ in the same render cycle.
+
+  wrong way code---async state didnt happen till now, if happened then 
+      anyways would have render in Dispatch in setState
+
+    let handleChange = input => {
+    setState(prevValue => {
+      return { value: input };
+    });
+    console.log(state.value);
+  };
+  return (
+    <div className="App">
+      <h1>{state.value}</h1>
+
+
+  right way code----------- h1 and console.log same
+ useEffect(() => {
+    console.log(state.value);
+  }, [state.value]);
+
+  let handleChange = input => {
+    setState(prevValue => {
+      return { value: input };
+    });
+  };
+
+  return (
+    <div className="App">
+      <h1>{state.value}</h1>
+
+
+
+other states become undefined in setState of only one state
+I'm not entirely sure what you want to do, you want to maintain the array in the state, but only change one color of a given tile? say, tile[0][0] = 'blue' instead of 'red'? If so, you could do it like this:
+
+newtiles = [...props.grid.tiles]
+newtiles[x][y].color = 'blue'
+props.setGrid({tiles: newtiles})
+----------------------------------------
+
+
+
+The react hook equivalent to the old componentWillReceive props can be done 
+using the useEffect hook, just specifying the prop that we want to listen
+ for changes in the dependency array.
+
+
+IMP - we mapped store state to local props. Thus on state update, 
+our local props changes and thus useEffect() listens to props means listens 
+to store state.
+
+Also, the register() is passed as props. So if we need 
+to do something after register() fn is invoked and returns, then need to listen
+to it too in useEffect() using [props.register]
+
+
+state.auth comes from rootreducer=combinereducer() passed to store, where in combinereducer() 
+     we pass our authReducer() in state by => rootreducer = combineReducers({auth:authReducer})
+
+
+ export default (props) => {
+
+    useEffect( () => {
+        console.log('counter updated');
+    }, [props.counter])
+
+    return <div>Hi {props.counter}</div>
+ }
+
+  A) useEffect( () => {
+    console.log(props);
+    console.log(location);
+    props.register(newUser); //calls dispatch(actionjson) which uses reducer
+  }, [props, location]);
+
+For componentDidUpdate just by omitting the dependency array,
+the useEffect function will be called after every re-render.
+  useEffect( () => {
+        console.log('counter updated');
+    })
+
+
+  dispatch = (actionjson, null | S |newFN) => { state = { ...state, null |S| newFN(), ...this.reducer(actionjson)};
+                                  this.subscribe.callback();
+                                   React.render();
+                                } 
+
+
+  B)function App() {
+
+  useEffect(() => {
+    store.dispatch(setCurrentUser()); //like dispatch(newFN()), 
+             //newFN() calls dispatch(actionjson) which uses reducer
+               //like calling dispatch inside dispatch, 
+                //newFN() doesnt reutrn anyhting thus second time state is same as dispatch(null);
+  },[])
+
+
+
+
+We can use the useRef hook to store any mutable value we like, 
+so we could use that to keep track of if it's the first time 
+the useEffect function is being run.
+If we want the effect to run in the same phase that 
+componentDidUpdate does, we can use useLayoutEffect instead.
+
+ const firstUpdate = useRef(true);
+  useLayoutEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false; //mutable object dont need setState()
+      return;
+    }
+
+    console.log("componentDidUpdateFunction");
+  });
+
+
+IMP
+useNavigate(), Link to="", 
+  does not render a new complete component with state 
+  when go back to that route again
+  the hooks/state/props and their previous/modified values are still present
+
+  thus this routing only does basic re-render like store.dispatch()
+   not complete intitial render
+
+
+  1)<Route exact path="/register/:role" element={<Register/>}/>
+  params= useParams();   
+  url = http://localhost:3000/register/customer
+  console.log(params);  //{role: 'customer}
+
+  2)this was path params. how to use query params hook? ans) useLocation
+  location = useLocation()
+  console.log(location.search); 
+    //location = {pathname: '/register', search: '?role=customer', hash: '', state: null, key: 'default'}
+    const name = new URLSearchParams(location.search).get('name');
+    const id = new URLSearchParams(location.search).get('id');
+    console.log({ name, id })
+ 
+  Use path variables when you need to identify a specific resource within the API and 
+  Use query parameters when you need to provide additional information or 
+  filter criteria without changing the core resource being accessed.
+
+
+
+ IMP
+  if both Links point to same Route, then component not rendered again 
+     even though url path different(location state/hook different) 
+     (props same here)
+        why? 
+        also if props different then will it render?
+         ans) props cant be different as means parent passing the prop as state,
+            parent state changing means parent render child will render anyways.
+
+---------------
+
+cookie vs token/session
+
+There is no magic, auth state has to be stored somewhere, either at server or client
+You may implement server stateful/stateless with either cookie or other custom headers
+When people talk about those things their default mindset is mostly: 
+stateless = token + custom header, stateful = auth ID + cookie;
+ these are NOT the only possible options
+
+But since most web apps need state, in order to hold 
+the state between server and client, cookies are used such that
+the server can send a cookie in every response back to the client. 
+This means the next request made from the client will include this 
+cookie and will thus be recognized by the server. This way the server 
+can maintain a session with the stateless client, knowing mostly everything 
+about the app's state, but stored in the server.
+
+
+The significant difference between cookie based authentication and what is now possible with HTML5 Web Storage is that browsers are built to send cookie data whenever they are requesting resources from the domain that set them.
+ You can't prevent that without turning off cookies. Browsers do not send data from Web Storage unless code in the page sends it. 
+ And pages can only access data that they stored, not data stored by other pages.
+So, a user worried about the way that their cookie data might be used by Google or Facebook might turn off cookies. 
+But, they have less reason to turn off Web Storage (until the advertisers figure a way to use that as well).
+So, that's the difference between cookie based and token based, the latter uses Web Storage.
+
+Token based authentication is stateless, 
+server need not store user information in the session. 
+This gives ability to scale application without worrying where the user has logged in. 
+
+https://stackoverflow.com/questions/17000835/token-authentication-vs-cookies
+
+
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+res.cookie(name_of_cookie, value_of_cookie);
+res.cookie(cookie_name, 'value', {expire: 400000 + Date.now()});
+res.clearCookie(cookieName);
+
+app.get('/logout', (req, res)=>{     //state stored on client
+//it will clear the userData cookie 
+res.clearCookie('userData'); 
+res.send('user logout successfully'); 
+});
+--------------------
+
+bootstrap and jquery for readymade dashboard
+1)same can use as CDN  in link href=.css and script scr=.js
+ <script type="module">
+      import * as bootstrap from 'bootstrap'
+
+      new bootstrap.Popover(document.getElementById('popoverButton'))
+  </script>
+
+
+2)or can download as node package(css and js bundles) and import and use the .css classes and .js classes
+@import "bootstrap/scss/transitions"; in .css file
+   <link href="css/sb-admin-2.min.css" rel="stylesheet"> in .html file
+
+import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"; or 
+const bootstrap = require('bootstrap') or import bootstrap from 'bootstrap'
+ //.js not good way as uses jquery to manipulate html elements
+
+SCSS is a special type of file for SASS, a program written in Ruby that assembles CSS style sheets for a browser, and for information, SASS adds lots of additional functionality to CSS like variables, nesting and more which can make writing CSS easier and faster.
+SCSS files are processed by the server running a web app to output a traditional CSS that your browser can understand.
+Sass is a CSS pre-processor with syntax advancements. 
+Style sheets in the advanced syntax are processed by the program, and turned into regular CSS style sheets.
+However, they do not extend the CSS standard itself.
+
+--
+
+3)js foler-
+  jquery.min.js -> jquery implementation file in js language .js
+  sb-admin-2.js -> dashboardjs implementation in jquery .js 
+
+jquery like bootstrap 3rd patry module. 
+    <script src="./assets/js/jquery.min.js"></script>
+    <script src="./assets/js/sb-admin-2.js"></script>
+bootstrap we get from CDN in .html directly (both .css and .js ) thus no need to add its .js file separately
+
+
+<div id="root"></div> 
+react implicitely adds all our application files 
+like app.js, store.js in <script> and .css files in <link> 
+here inside this div
+
+and react-scripts.start creates frontend server and hosts all our 
+localhost files for browser/html file to read.
+
+
+--------------------------
+
+if no dependecy array in useEffect, useEffects runs 
+like componentdidupdate, unmount
+
+if dependency array, useEffect only runs when these dependends change
+first time everything new thus useEffect runs 2 times didcreate,didmount.
+   if using useRef() hook, first time, return 1 time didcreate, run 1 time didmount. 
+        rerender as useRef state changes but useEffect wont run again as doesnt listen to useRef state
+
+in <Register>, first time everything created thus useEffect runs. then
+   onChange only local state changes, rerender,
+       local state same after render due to hooks, 
+       useEffect listens to store state/ props thus doesnt run
+
+    onSubmit  store state/props changes, rerender,
+       store state/props same after render due to hooks, 
+       useEffect listens to store state/props thus runs 
+               due to change in previous loop  
+
+in <Products>
+
+useEffect(() => {
+  props.getProducts();
+  console.log(props);
+          //this will print null props as store.dispatch
+            change reflects on next render to update state.
+            but able to see in reactdevtools after change new render
+}, []);
+
+if [props]); infinite loop as first run didcreate, 
+   inside state/prop change, rerender, will run again next time
+    as [props] changed before, thus useEffect runs now again 
+    after , and infinite loop
+
+
+now []); first render
+useEffect runs first time (on didcreate doesnt run as useRef) didmount
+and sets products in store state which is props.
+something changed, rerender
+but now after new render wont run as runs only once
+ (///*didnt update component till now 
+thus doesnt run useEffect infinite, only when component updates*/)
+
+
+0)runs one time always every hook when componentdidcreate
+
+1)useEffect(() => {  
+        //componentdidmount
+    props.getProducts();
+  }, []);
+ 
+       //component will receive props, runs after rerender caused due to props change
+2)useEffect(() => {  
+    console.log(props); 
+  }, [props]);
+
+      //componentdidupdate , run on after rerender irrespective of cause
+ 3)useEffect(() => {  
+    console.log(props); 
+  }); 
+
+IMP
+if dont explicity make dependency arrray empty[](didmount)
+ or add fields[props],
+ then didupdate, all props and state changes useEffect()
+       will run everytime means like after every render
+
+
+If you do not pass a dependency array to the useEffect hook, it will not default to 
+   an empty array. Instead, it will run the effect after every render. 
+An empty dependency array means that the effect does not depend on 
+   any values from the component scope.  Therefore, it should only run once after the
+    initial render and not on any subsequent renders.
+
+However, if your effect does depend on some values from the component scope, 
+and you don't include them in the dependency array, you may encounter bugs in your 
+application. This is because the effect will always use the values from the 
+initial render and will not have access to the updated values in subsequent renders.
+(means need new values after render to run useeffect triggered by previous render loop.
+ but if we dont pass in dependency array useeffect will use the old values.
+
+ also if pass means useeffect trigger after new render only when those values change
+)    
+
+
+The useEffect([]) syntax is used when you want the effect to run only once after 
+the initial render and not on subsequent renders. 
+This is equivalent to the componentDidMount lifecycle method in class components.
+
+
+The useRef creates an "instance variable" in functional component. It acts as a flag to indicate whether it is in mount or update phase without updating state.
+
+const create = useRef(true);
+const mounted = useRef();
+useEffect(() => {
+  if(create){
+    // do component did create logic
+    create=false;
+    return;
+  }
+
+  if (!mounted.current) {
+    // do componentDidMount logic
+    mounted.current = true;
+  } else {
+    // do componentDidUpdate logic
+  }
+});
+-------------------------------------------------------
+
+
+<Meta title={product.name} description="www.instagram.com" />
+  description is a ReactNode type thus create fn and return JSX here
+
+----------------------
+
+the (non-standard) object spread operator in JSX and (fn params)
+   const PrivateRoute = ({ component: Component, ...rest }) => 
+the rest_/_spread operator as defined in the ECMAScript 2015 ES6
+
+-------------------
+
+
+Link also uses Navigate inside. navigate("path");
+the path must match any of paths inside first parent router
+
+on clicking dashboard, link to /dashboard
+on routing to /dashboard, if not auth, naviagte to /login
+ thus if not authenticated, 2 times navigation done
+
+If you need to replace the current location instead of push a new one onto the history stack, use navigate(to, { replace: true }). If you need state, use navigate(to, { state }). You can think of the first arg to navigate as your <Link to> and the other arg as the replace and state props.
+
+If you prefer to use a declarative API for navigation 
+(ala v5's Redirect component), v6 provides a Navigate component.
+------------------------
+
+
+{/*<ProtectedRoute exact path="/dashboard" component={Dashboard}/>*/}
+//<Route exact path="/dashboard" element={<ProtectedRoute component={Dashboard}/>}/>
+    <Route exact path="/dashboard" 
+    element={<ProtectedRoute component={() => 
+              (<Dashboard {...props} nestedRoute={Home}/>)}/>}/>
+
+const ProtectedRoute = connect(mapStateToProps)(({component: Component, auth, ...rest}) => {
+    
+  return ( 
+    //<Route {...rest}
+    //    element= {(props) => 
+            auth.isAuthenticated? <Component { ...{...rest, auth}}/> : <Navigate to="/login"/>
+    //    } 
+    ///>     
+  );               //exact path goes in ...rest
+});
+
+route will always be at top component even if components inside
+(like register login inside navbar still their routes is at top)
+(/pathrouter1/ can have routers inside path also but )
+
+different routes render diffrent parent components and 
+  even pass different child components to render as props
+----------------------------
+
+Dropdowns are toggleable, contextual overlays for displaying lists of links and more. They’re made interactive with the included Bootstrap dropdown JavaScript plugin.
+Dropdowns are built on a third party library, Popper.js, which provides
+ dynamic positioning and viewport detection. 
+ Be sure to include popper.min.js before Bootstrap’s JavaScript or use
+  bootstrap.bundle.min.js / bootstrap.bundle.js which contains Popper.js. 
+
+
+-----------------------------
+
+  isAuthenticated: localStorage.getItem("token")? true: false,
+   //instead of false everytime first when component rendered
+
+  {user.name && this.avatarText(user.name)} 
+    //as first time when component is loading doest get all info from redux store
+------------------------
+
+to make a Card clickable, wrap Link around it
+
+<div style={{}}> //inline css
+
+p = products.filter((product) => product.userId === userId);
+------
+
+morgan npm middleware for server api hit logging
+
+
+  window.location.reload();
+  e.preventDefault()
+
+---------
+
+system hld design - 
+
+  1)backend- productsmodel(userId)  <- usermodel -> profilemodel(userId) 
+            -> cartmodel(1:1 userId)(1:n productsId[]) <-
+  2)backend - auth via just api header token storing useriD, api to post, getAll, get(userId)
+  3) frontend - at start set api header from token db
+                 (set auth state and get-set user state) on mount
+  3)if(not auth state) show Dashboard, Register, Login,  
+           in Login show link to Register
+           in Dashboard redirect to Login via token/auth state
+  4)if(login/register) 
+           (set token db, 
+            [set api header and  
+            set auth state and get-set user state])
+            hide Register, Login, show Logout
+              (in logout not removing api header but ok as no auth state 
+              then will never call auth routes as dashboard not shown)
+
+
+      (token state no use nowhere using, taking from db only and using auth state)
+  5)thus Dashboard only for logged in, AddProducts, show Products for a User
+               getProducts and set products props/store state on mount
+               and set local state on propswillreceive
+                   and show it
+               (no need local state if directly showing props)
+  6)and home page irrespective of login show all products
+  7)loggedin, thusin dashboard Profile getProfile andedit for User
+               getProfile and set profile props/store state on mount
+               and set local state on propswillreceive
+                   and show it
+               (no need local state if directly showing props) 
+  8) on clicking product on home , navigate to product details             
+        user may or maynot be logged in to see product details and click add to cart
+        thus dont restrict display of component via isAuth state as not authenticated users must also be able to see product details
+             and add to cart.
+             (when add to cart button clicked,
+              if not authenticated store cart in localstorage post/remove, if auth later then call secure api to post/remove product in cart)
+                                                                           if auth earlier the just get cart and then post/remove as needed
+     
+     thus product details page has 2 states -> auth state(set in login/register action which calls authreducer) and  
+                                            -> products.product state(set in the productdetails compoenent itself 
+                                                 when getProduct detail action called which calls productreducer)        
+  9)  on window.location.reload() or browser reload all store states are lost
+        but app made in such a way that 
+        A)in <App> mount get token from db, set api header 
+               and get user and set auth and user state 
+               and get cart from db and post //and store state
+
+      IMP - code should be such a way that 1)on App reload/mount or 2)login/redgister action 
+            both should run setcurrentUser() and grabProductsFromStorage()   
+
+        B) in rest of the component, on component mount 
+                 call action that gets the component state from api call(header already set in <App>) 
+                    and set that in store state when action calls reducer 
+                 and on propschange set the store state as props to local component state   
+                 
+                 for api call few specific things needed like 
+                     for <Profile> userid(get and decode from token in db)
+                        (if profile state not present already frontend logic check there to redirect to add profile)
+                     for parent <Dashboard> itself <ProtectedRoute> if auth not present redirect to login
+                     for <ProductDetails> dont need auth as said above.
+                         if product state not able to get keep on loading ,// but mostly go from products page so data needs to be there
+                      for <Products> also same, but product needs tokens userid, and will be present as we are in <Dasdboard> which needs auth
+
+
+
+
+--------
+
+profile.soicalMedia doesnt exist first as props passing some delay
+if profile doesnt exist for user then server gives 400 error
+
+  //component will receive props
+  let firstUpdate2 = useRef(0);        
+  useEffect(() => {  
+    if(firstUpdate2.current<2){
+        firstUpdate2.current++;
+        return;
+    }
+
+useeffect component receive props runs 2 times first 
+ 1) default
+ 2) props initialised with reducer default values
+ 3) then any other props change
+
+
+---------------
+redux store mostly used for state of complete application 
+    like auth, user, profile, products etc 
+    and is like application root component state
+  for small components directly use state or pass state as props
+
+same with router, mostly for complete application 
+           based on Links/Buttons
+   for small navigation use navigate() or <Navigate/>
+        based on js logic like fn call login, state isAuth
+
+
+with connect, complete state is passed to call 
+components and their actions connect(, {actions}) ((props)=>{});
+
+{
+    "state": {
+        "auth": {
+            "isAuthenticated": true,
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY4MWIyNjc0OGE3MTVjYThjNzExMmIyIn0sImlhdCI6MTcxOTg0ODMyNSwiZXhwIjoxNzE5OTM0NzI1fQ.hIYzG-Fh2lkEnbGxiRjBxyMeU3KG2c4lHnVjM4iYaWQ",
+            "user": {
+                "_id": "6681b26748a715ca8c7112b2",
+                "name": "abhi",
+                "email": "abhi@gmail.com",
+                "role": "customer",
+                "date": "2024-06-30T19:30:47.702Z",
+                "__v": 0
+            },
+            "errors": []
+        },
+        "products": {
+            "products": [
+                {
+                    "_id": "6672a4219ef7c0a10d347eb7",
+                    "userId": "6672776058a75d557f1593b4",
+                    "name": "Lenovo 233 Laptop",
+                    "description": "Portable and durable laptop",
+                    "category": "electronics",
+                    "price": 500,
+                    "brand": "Lenovo",
+                    "quantity": 100,
+                    "created": "2024-06-19T09:23:57.410Z",
+                    "updated": "2024-06-19T09:23:57.410Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "667d95446690ce4a0c2d9df1",
+                    "userId": "6672776058a75d557f1593b4",
+                    "name": "Lenovo 233 Laptop",
+                    "description": "Portable and durable laptop",
+                    "category": "electronics",
+                    "price": 500,
+                    "brand": "Lenovo",
+                    "quantity": 100,
+                    "created": "2024-06-19T09:23:57.410Z",
+                    "updated": "2024-06-19T09:23:57.410Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "6681b2a648a715ca8c7112b7",
+                    "userId": "6681b26748a715ca8c7112b2",
+                    "name": "ccc",
+                    "description": "cc",
+                    "category": "Clothing",
+                    "price": 34,
+                    "brand": "dscsdc",
+                    "quantity": 34,
+                    "created": "2024-06-30T19:31:50.436Z",
+                    "updated": "2024-06-30T19:31:50.436Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "6681b2b548a715ca8c7112ba",
+                    "userId": "6681b26748a715ca8c7112b2",
+                    "name": "efef",
+                    "description": "sdc",
+                    "category": "Office Supply",
+                    "price": 4,
+                    "brand": "edd",
+                    "quantity": 65,
+                    "created": "2024-06-30T19:32:05.590Z",
+                    "updated": "2024-06-30T19:32:05.590Z",
+                    "__v": 0
+                }
+            ],
+            "product": {},
+            "errors": {}
+        },
+        "profile": {
+            "profile": {
+                "socialMedia": {
+                    "facebook": "www.facebook.com/talde",
+                    "twitter": "www.twitter.com/topelet",
+                    "youtube": "www.youtube.com/talde"
+                },
+                "_id": "6681b2c848a715ca8c7112bf",
+                "userId": "6681b26748a715ca8c7112b2",
+                "website": "www.taldeo.com",
+                "address": "ceccvfcvefd",
+                "bio": "cdscds",
+                "created": "2024-06-30T19:32:24.092Z",
+                "__v": 0
+            },
+            "errors": [],
+            "error": {}
+        }
+    }
+}
+----------------
+
+ <hr/>, <br/>, <b>
+<Fragment>
+
+
+
+
