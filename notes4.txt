@@ -1,0 +1,97 @@
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+0)normally, git pull in heroku, heroku gives an ip and expose its one port then run the app run command.
+and maybe if want run a scheduled job to pull from github and run the app again 
+
+1)but my ci/cd and cloud,
+travis ci, whenever pushed to github, automatically builds the image and hosts.(doesnt wait for scheduled job)
+and the gcp pull the image and restarts only those specific docker containers using those images
+
+(
+  2)if scheduled job with gcp instead of ci/cd and containers then just like heroku, but gcp gives better features like vnet, firewall, image/blob storage etc.
+  3)also containerization needed as every service not dependent on another and each service can be updated/scaled independently
+            (else different services run like different apps/processes on host-port if not using containers) 
+  as ci/cd listens to that containers entry folder in github
+  4)if scheduled job with docker in gcp instead of ci/cd then gcp will have to pull and build image everytime as running on containers not natively
+   (means gcp is running the .sh commands job instead of ci/cd online shells)
+)
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+Done with Docker, CI/CD(just shell scripts online shell) and Github(Dockerhub also same) at this point. only Cloud and TF left.
+
+
+
+
+
+If you're using Azure CLI over a proxy server that uses self-signed certificates,
+ the Python requests library used by the Azure CLI might cause the following error: SSLError("bad handshake: Error([('SSL routines', 'tls_process_server_certificate', 'certificate verify failed')],)",). To address this error, 
+ set the environment variable REQUESTS_CA_BUNDLE to the path of CA bundle certificate file in PEM format.
+
+
+export REQUESTS_CA_BUNDLE=/Users/abhinav.bhattacharje/mern/infrastructure-as-code-talk-docker-terraform/infrastructure-as-code-talk/sinatra-backend/proxy-cert-2.pem 
+
+
+azure cloud - 
+Azure Cloud Shell requires a storage account with Azure file share to persist files. Select an option below to mount a storage account
+subscription - 54001000 abhinavbhattacharjee
+snow subscription login using sso
+resource group - testvm
+
+Subscription: 54001000 abhinavbhattacharjee
+Resource group: 88a798b0-9501-4368-ba51-65960c63f5ea/resourcegroups/cloud-shell-storage-centralindia
+Storage account: csg10032002b8b2b06f
+File share: cs-abhinav-bhattacharje-servicenow-com-10032002b8b2b06f
+Region: Central Indiaf
+
+>az account show
+>az group list
+>az group show --resource-group testvm
+>az vm image list
+>az vm list
+>az vm show -n testvm1 --resource-group testvm
+>az vm create -n MyVm -g MyResourceGroup --image Ubuntu2204
+
+just create your own azure , aws, and gcp account and use in personal laptop
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+AWS ECS is just a logical grouping (cluster) of EC2 instances, and all the EC2 instances part of an ECS act as Docker host i.e. 
+ECS can send command to launch a container on them (EC2). 
+
+
+Docker is a utility you can install on our machine, which makes it a Docker host, and on this host you can create containers (same as virtual machines - 
+but much more light-weight). To sum up, ECS is just about clustering of EC2 instances, and uses Docker to instantiate many containers/instances/virtual
+ machines on these (EC2) hosts.
+
+
+EC2 allows you to launch individual instances which you can use for pretty much whatever you like. ECS is a container service,
+ which means it will launch instances that will be ready to launch container applications
+ Elastic Container Service (ECS) is a Docker container orchestration service.
+
+You can ask it to run one or more Docker images, either as an auto-scaling capable "Service" or as an ad-hoc "Task".
+The services and tasks run on a "Cluster". Originally, a Cluster was a group of one or more pre-configured EC2 servers running ECS Cluster Agent. The Cluster Agent would schedule the containers on the EC2 server. These EC2 servers show up in your EC2 Instances list and are charged at regular EC2 per-minute costs - You can even SSH onto them like any normal EC2 server. If you wanted more capacity to run more Services or Tasks, or if you wanted resilience against EC2 failure, then you would more EC2 servers.
+Around November 2017, AWS added ECS Fargate. Now a Cluster can run "serverless" without provisioning EC2 nodes. You simply define the amount of CPU and memory your Task or Service requires to operate, meaning that you just pay for the CPU and memory time rather than the EC2.
+
+ECS is a container orchestrator just like Kubernetes or Docker swarm, EC2 is an Amazon Elastic Compute Cloud platform for Creating Virtual Machines.
+ ECS allows you to run containers on either serverless environments (Fargate) where you don't have to run any VM or in a non managed environments 
+ where you host the containers on EC2 instances.
+
+https://stackoverflow.com/questions/40575584/what-is-the-difference-between-amazon-ecs-and-amazon-ec2
+
+
+
+
+
+
+
+
+
+

@@ -876,7 +876,7 @@ WORKDIR /usr/src/app     //workdir of the app inside the container os
 
 # Install dependencies in a cache-friendly way  //copy the package.json and do npm install first and then copy rest code
 COPY Gemfile Gemfile.lock /usr/src/app/
-RUN bundle install
+RUN bundle install                              //means > /bin/sh -c bundle install    
 
 # Now copy the rest of the source code
 COPY . /usr/src/app
@@ -1157,6 +1157,8 @@ docker tutorial part read, finish the course on personal laptop
 
 >docker push bhattacharjeeabhinav/ecommerceapp:tagname
 
+
+
 OS/arch
   Docker has been able to run Linux containers on Windows desktop since it was first released in 2016 (before Hyper-V isolation or Linux containers on Windows were available) 
   using a LinuxKit based virtual machine running on Hyper-V(windows)
@@ -1181,10 +1183,131 @@ OS/arch
         https://forums.docker.com/t/working-with-windows-and-linux-containers-in-docker-compose/134318
 
 
+ by default the docker server vm is linux only. thus in windows machine uses another basevm wsl and in that uses the actual docker vm thus 2 vms by default like.
+    thus starting and stopping docker daemon takes time in windows
+
+ i dont need to but using multiplatform image ability in my containerd vm windows. thus using docker-linux for amd64 builder 
+
+---------------------
+instead of links, use depends_on: server in docker compose
+
+
+>docker build -t rails-frontend-image .   //rails-frontend-image:latest is the repository:tag, uses latest by default,  . is the path to dockerfile
+>docker image ls
+
+>docker tag 7282248e289c bhattacharjeeabhinav/ecommerceapp:rails-frontend-image
+REPOSITORY                          TAG                    IMAGE ID       CREATED          SIZE
+bhattacharjeeabhinav/ecommerceapp   rails-frontend-image   7282248e289c   12 minutes ago   1.54GB
+rails-frontend-image                latest                 7282248e289c   12 minutes ago   1.54GB
+>docker login
+>docker push bhattacharjeeabhinav/ecommerceapp:rails-frontend-image       //push the image with this repository:tag to our loggedin account same repo with same tag
+>docker pull bhattacharjeeabhinav/ecommerceapp:rails-frontend-image
+
+the localimage 2.9GB is saved somewhere not is home directory
+tag image, login to dockerhub, push image. 
+//same with github, pulling, making changes locally doesnt need login(till now doesnt have identity) but pushing need login as need to know who is pushing. 
+     //(checks in the collaborators section for push and pull section)
+     //dockerhub also works like github only
+
+ //>docker history 7282248e289c
+
+1)You can push the docker image to the Dockerhub with using docker push command aftering changing the tag of the image with your docker hub username and repository name.
+2)push to dockerhub using jenkinsfile -   
+  You can push the docker image to the docker hub using the Jenkinsfile by specifying the steps such as docker build , push of the docker image using the Docker Pipeline plugins.
+    Q)is jenkinsfile like a bash script? Ans) mostly yes, .yaml like .sh line by line script
+3)Q)How do I push a docker image from GitHub to Docker Hub?
+  Ans) We can push the docker image from Github to the Dockerhub by configuring the github actions workflow CI/CD
+               (thus github actions also is CI/CD shell online like jenkins,  just a shell script .yaml instead of .sh) 
+       OR by configuring any other CI/CD pipeline we are using (like jenkins instead of github actions)
+       that builds the docker image from the github repository and pushes it to the Dockerhub.  
+
+https://github.com/docker/awesome-compose/blob/master/react-express-mongodb/compose.yaml
+
+
+
+    image: bhattacharjeeabhinav/ecommerceapp:rails-frontend-image 
+>docker-compose up   //recreates/builds the container and runs 
+OR >docker run bhattacharjeeabhinav/ecommerceapp:rails-frontend-image   //image   
+>docker-compose ps
+>docker-compose images  //the docker compose is build only actually and when stop just stops the container
+
+>docker stop  9d735c0f79dc6f62eb30d4439ef400e0fe183f855744900b0b29c46feb836c64 //any specific container stop
+           //but doesnt delete the built new image
+>docker-compose stop   
+           //stops all the services or any service you mentioned and their containers, but doesnt delete the build new/fetched image
+>docker-compose start 
+           //starts/runs/resumes  all the images/services or any service you mentioned //doesnt create again/build, to create again/build use docker-compose up
+
+there is difference between images and containers.   
+when building/run/docker-compose up, images are built/fetched and stored. and then again NEW containers are run using them as base
+when we stop or remove containers,(like new images) only these containers are stopped/removed not the image itself
+
+
+>docker ps -a    //show all containers including stopped/exited
+>docker rm -f 7282248e289c   //containerid
+          //to remove all containers(need to build again/pull from repo using docker run/ docker-compose up if already image not there in local)
+>docker-compose rm  //remove all services and their containers
 
 
 
 
+services:
+  frontend:
+    build:
+      context: frontend
+      target: development
+    ports:
+      - 3000:3000
+         //container application connect and listen on this vm port and host port forwarded to vm port so that public internet traffic also connect
+    stdin_open: true
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    networks:
+      - react-express
+    depends_on:
+      - backend
+
+  backend:
+    restart: always
+    build:
+      context: backend
+      target: development
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+            //vm default directory to container directory data flows
+    depends_on:
+      - mongo
+    networks:
+      - express-mongo
+      - react-express
+    expose: 
+      - 3000
+  mongo:
+    restart: always
+    image: mongo:4.2.0
+    volumes:
+      - mongo_data:/data/db           
+         //container taking data from the docker vm created volume on vm, instead of the vm default directory (which in turn taken from host but that not confogured here)
+    networks:
+      - express-mongo
+         //internal container network etc firewall must be open for this service
+    expose:
+      - 27017
+         //just container application connect and listen on this vm port, so that containers can talk to other containers in the vm
+networks:
+  react-express:
+  express-mongo:
+
+volumes:
+  mongo_data: 
+    //if local db instead of cloud atlas then use volume to store data even if service/containers get stopped and removed.
+    // (as long as vm is there, this volume/data is there on the vm's disk)
+
+
+https://github.com/docker/awesome-compose/blob/master/react-express-mongodb/compose.yaml
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -1197,91 +1320,6 @@ OS/arch
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-----------------------------------------------------------------------------------------------------------------------------------------
-
-0)normally, git pull in heroku, heroku gives an ip and expose its one port then run the app run command.
-and maybe if want run a scheduled job to pull from github and run the app again 
-
-1)but my ci/cd and cloud,
-travis ci, whenever pushed to github, automatically builds the image and hosts.(doesnt wait for scheduled job)
-and the gcp pull the image and restarts only those specific docker containers using those images
-
-(
-  2)if scheduled job with gcp instead of ci/cd and containers then just like heroku, but gcp gives better features like vnet, firewall, image/blob storage etc.
-  3)also containerization needed as every service not dependent on another and each service can be updated/scaled independently 
-  as ci/cd listens to that containers entry folder in github
-  4)if scheduled job with docker in gcp instead of ci/cd then gcp will have to pull and build image everytime as running on containers not natively
-)
-----------------------------------------------------------------------------------------------------------------------------------------
-
-
-If you're using Azure CLI over a proxy server that uses self-signed certificates,
- the Python requests library used by the Azure CLI might cause the following error: SSLError("bad handshake: Error([('SSL routines', 'tls_process_server_certificate', 'certificate verify failed')],)",). To address this error, 
- set the environment variable REQUESTS_CA_BUNDLE to the path of CA bundle certificate file in PEM format.
-
-
-export REQUESTS_CA_BUNDLE=/Users/abhinav.bhattacharje/mern/infrastructure-as-code-talk-docker-terraform/infrastructure-as-code-talk/sinatra-backend/proxy-cert-2.pem 
-
-
-azure cloud - 
-Azure Cloud Shell requires a storage account with Azure file share to persist files. Select an option below to mount a storage account
-subscription - 54001000 abhinavbhattacharjee
-snow subscription login using sso
-resource group - testvm
-
-Subscription: 54001000 abhinavbhattacharjee
-Resource group: 88a798b0-9501-4368-ba51-65960c63f5ea/resourcegroups/cloud-shell-storage-centralindia
-Storage account: csg10032002b8b2b06f
-File share: cs-abhinav-bhattacharje-servicenow-com-10032002b8b2b06f
-Region: Central Indiaf
-
->az account show
->az group list
->az group show --resource-group testvm
->az vm image list
->az vm list
->az vm show -n testvm1 --resource-group testvm
->az vm create -n MyVm -g MyResourceGroup --image Ubuntu2204
-
-just create your own azure , aws, and gcp account and use in personal laptop
-
-
-
-----------------------------------------------------------------------------------------------------------------------------------------
-
-AWS ECS is just a logical grouping (cluster) of EC2 instances, and all the EC2 instances part of an ECS act as Docker host i.e. 
-ECS can send command to launch a container on them (EC2). 
-
-
-Docker is a utility you can install on our machine, which makes it a Docker host, and on this host you can create containers (same as virtual machines - 
-but much more light-weight). To sum up, ECS is just about clustering of EC2 instances, and uses Docker to instantiate many containers/instances/virtual
- machines on these (EC2) hosts.
-
-
-EC2 allows you to launch individual instances which you can use for pretty much whatever you like. ECS is a container service,
- which means it will launch instances that will be ready to launch container applications
- Elastic Container Service (ECS) is a Docker container orchestration service.
-
-You can ask it to run one or more Docker images, either as an auto-scaling capable "Service" or as an ad-hoc "Task".
-The services and tasks run on a "Cluster". Originally, a Cluster was a group of one or more pre-configured EC2 servers running ECS Cluster Agent. The Cluster Agent would schedule the containers on the EC2 server. These EC2 servers show up in your EC2 Instances list and are charged at regular EC2 per-minute costs - You can even SSH onto them like any normal EC2 server. If you wanted more capacity to run more Services or Tasks, or if you wanted resilience against EC2 failure, then you would more EC2 servers.
-Around November 2017, AWS added ECS Fargate. Now a Cluster can run "serverless" without provisioning EC2 nodes. You simply define the amount of CPU and memory your Task or Service requires to operate, meaning that you just pay for the CPU and memory time rather than the EC2.
-
-ECS is a container orchestrator just like Kubernetes or Docker swarm, EC2 is an Amazon Elastic Compute Cloud platform for Creating Virtual Machines.
- ECS allows you to run containers on either serverless environments (Fargate) where you don't have to run any VM or in a non managed environments 
- where you host the containers on EC2 instances.
-
-https://stackoverflow.com/questions/40575584/what-is-the-difference-between-amazon-ecs-and-amazon-ec2
 
 
 

@@ -594,6 +594,7 @@ To test Google Pay, you'll want to make sure you add a card to your Google Pay w
       >stripe listen --forward-to localhost:5000/api/payment/confirmpayment --events payment_intent.succeeded --skip-verify   
               //Forward events to your webhook http, get stripeEndpointSecret
       means instead of hosted endpoint, adding a local listener using stripe cli, has its own stripeEndpointSecret (as it can forward the request to all the interfaces our server is listening on)
+      maybe implemented as local stripe polls the web stripe 
    
 
    CODE- 
