@@ -38,7 +38,8 @@ export REQUESTS_CA_BUNDLE=/Users/abhinav.bhattacharje/mern/infrastructure-as-cod
 
 
 azure cloud - 
-Azure Cloud Shell requires a storage account with Azure file share to persist files. Select an option below to mount a storage account
+Azure Cloud Shell requires a storage account with Azure file share to persist files(like volumes on docker, else all file data and state deleted). 
+Select an option below to mount a storage account
 subscription - 54001000 abhinavbhattacharjee
 snow subscription login using sso
 resource group - testvm
@@ -47,12 +48,12 @@ Subscription: 54001000 abhinavbhattacharjee
 Resource group: 88a798b0-9501-4368-ba51-65960c63f5ea/resourcegroups/cloud-shell-storage-centralindia
 Storage account: csg10032002b8b2b06f
 File share: cs-abhinav-bhattacharje-servicenow-com-10032002b8b2b06f
-Region: Central Indiaf
+Region: Central India
 
 >az account show
 >az group list
 >az group show --resource-group testvm
->az vm image list
+>az vm image list //all the default vm images(like packer images) for unix/windows etc on azure hub(like docker base images)
 >az vm list
 >az vm show -n testvm1 --resource-group testvm
 >az vm create -n MyVm -g MyResourceGroup --image Ubuntu2204
@@ -67,7 +68,7 @@ AWS ECS is just a logical grouping (cluster) of EC2 instances, and all the EC2 i
 ECS can send command to launch a container on them (EC2). 
 
 
-Docker is a utility you can install on our machine, which makes it a Docker host, and on this host you can create containers (same as virtual machines - 
+Docker is a utility you can install on our machine, which makes it a Docker host, and on this host you can run a vms which creates containers (same as virtual machines - 
 but much more light-weight). To sum up, ECS is just about clustering of EC2 instances, and uses Docker to instantiate many containers/instances/virtual
  machines on these (EC2) hosts.
 
@@ -78,17 +79,115 @@ EC2 allows you to launch individual instances which you can use for pretty much 
 
 You can ask it to run one or more Docker images, either as an auto-scaling capable "Service" or as an ad-hoc "Task".
 The services and tasks run on a "Cluster". Originally, a Cluster was a group of one or more pre-configured EC2 servers running ECS Cluster Agent. The Cluster Agent would schedule the containers on the EC2 server. These EC2 servers show up in your EC2 Instances list and are charged at regular EC2 per-minute costs - You can even SSH onto them like any normal EC2 server. If you wanted more capacity to run more Services or Tasks, or if you wanted resilience against EC2 failure, then you would more EC2 servers.
-Around November 2017, AWS added ECS Fargate. Now a Cluster can run "serverless" without provisioning EC2 nodes. You simply define the amount of CPU and memory your Task or Service requires to operate, meaning that you just pay for the CPU and memory time rather than the EC2.
+Around November 2017, AWS added ECS Fargate. Now a Cluster can run "serverless" without provisioning EC2 nodes(means provisioning EC2 handled by amazon instead of us based on ram/cpu).
+ You simply define the amount of CPU and memory your Task or Service requires to operate, meaning that you just pay for the CPU and memory time rather than the EC2.
 
 ECS is a container orchestrator just like Kubernetes or Docker swarm, EC2 is an Amazon Elastic Compute Cloud platform for Creating Virtual Machines.
- ECS allows you to run containers on either serverless environments (Fargate) where you don't have to run any VM or in a non managed environments 
- where you host the containers on EC2 instances.
+ ECS allows you to run containers on either serverless environments (Fargate)(amazon handles the ec2s, we manage the containers) where you don't have to run any VM or in a non managed environments 
+ where you host the containers on EC2 instances.(we manage both ec2s and containers on them)
 
 https://stackoverflow.com/questions/40575584/what-is-the-difference-between-amazon-ecs-and-amazon-ec2
 
 
 
 
+--------
+
+actual tf.main :-
+
+
+module "rails_frontend" {
+  source = "./ecs-service"
+
+  name = "rails-frontend"
+  ecs_cluster_id = "${module.ecs_cluster.ecs_cluster_id}"
+
+  image = "${var.rails_frontend_image}"
+  image_version = "${var.rails_frontend_version}"
+  cpu = 1024
+  memory = 768
+  desired_count = 2
+
+  container_port = "${var.rails_frontend_port}"
+  host_port = "${var.rails_frontend_port}"
+  elb_name = "${module.rails_frontend_elb.elb_name}"
+
+  # Provide the URL of the sinatra-backend ELB using the same environment variable name and format as docker-compose
+  num_env_vars = 2
+  env_vars = "${map(
+    "RACK_ENV", "production",
+    "SINATRA_BACKEND_PORT", "tcp://${module.sinatra_backend_elb.elb_dns_name}"
+  )}"
+}
+-------
+
+
+inside tf module .main :-
+
+# CREATE AN ECS SERVICE TO RUN A LONG-RUNNING ECS TASK
+# We also associate the ECS Service with an ELB, which can distribute traffic across the ECS Tasks.
+# ---------------------------------------------------------------------------------------------------------------------
+
+resource "aws_ecs_service" "service" {
+  name = "${var.name}"
+  cluster = "${var.ecs_cluster_id}"
+  task_definition = "${aws_ecs_task_definition.task.arn}"
+  desired_count = "${var.desired_count}"
+  iam_role = "${aws_iam_role.ecs_service_role.arn}"
+
+  deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
+  deployment_maximum_percent = "${var.deployment_maximum_percent}"
+
+  load_balancer {
+    elb_name = "${var.elb_name}"
+    container_name = "${var.name}"
+    container_port = "${var.container_port}"
+  }
+
+  depends_on = ["aws_iam_role_policy.ecs_service_policy"]
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
+# CREATE AN ECS TASK TO RUN A DOCKER CONTAINER
+# ---------------------------------------------------------------------------------------------------------------------
+
+resource "aws_ecs_task_definition" "task" {
+  family = "${var.name}"
+  container_definitions = <<EOF
+[
+  {
+    "name": "${var.name}",
+    "image": "${var.image}:${var.image_version}",
+    "cpu": ${var.cpu},
+    "memory": ${var.memory},
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": ${var.container_port},
+        "hostPort": ${var.host_port},
+        "protocol": "tcp"
+      }
+    ],
+    "environment": [${join(",", data.template_file.env_vars.*.rendered)}]
+  }
+]
+EOF
+}
+--------
+
+
+In terraform providers
+1) Ecs_cluster manages each EC2 Instance that will run in the ECS Cluster
+2) Ecs_instance is like a aws host vm( based on customised packer like image launch configuration we mention in ecs_instance)
+         ecs_instance - image_id = "${data.aws_ami.ecs.id}" 
+         data "aws_ami" "ecs" {  values = ["amzn-ami-*-amazon-ecs-optimized"],}   
+         ecs_cluster manages this like t2.micro
+3) inside Ecs_instance(host vm), we create Ecs_service(docker vm)  (they have elb load balacer configured to talk to other docker/host vm)
+         //doesnt need any image as the standards docker just need config
+          all ecs_service managed by cluster ecs_cluster
+4) inside Ecs_service(docker vm) we create aws_ecs_task_definition(docker container/task)  (based on customised docker image we mention in aws_ecs_task_definition)
+
+  2.2) Ec2 is like a aws host vm thus needs ec2 packer image(like ecs_intance like t2 micro)
 
 
 

@@ -1188,6 +1188,12 @@ OS/arch
 
  i dont need to but using multiplatform image ability in my containerd vm windows. thus using docker-linux for amd64 builder 
 
+
+    Play with Docker uses the amd64 platform. If you are using an ARM based Mac with Apple silicon, you will need to rebuild the image to be compatible with Play with Docker and push the new image to your repository.
+    To build an image for the amd64 platform, use the --platform flag.
+    >docker build --platform linux/amd64 -t YOUR-USER-NAME/getting-started .
+    Docker buildx also supports building multi-platform images. To learn more, see Multi-platform images.
+
 ---------------------
 instead of links, use depends_on: server in docker compose
 
@@ -1195,7 +1201,7 @@ instead of links, use depends_on: server in docker compose
 >docker build -t rails-frontend-image .   //rails-frontend-image:latest is the repository:tag, uses latest by default,  . is the path to dockerfile
 >docker image ls
 
->docker tag 7282248e289c bhattacharjeeabhinav/ecommerceapp:rails-frontend-image
+>docker tag 7282248e289c bhattacharjeeabhinav/ecommerceapp:rails-frontend-image     //use imageid or oldlocalimagerepo:tag both works
 REPOSITORY                          TAG                    IMAGE ID       CREATED          SIZE
 bhattacharjeeabhinav/ecommerceapp   rails-frontend-image   7282248e289c   12 minutes ago   1.54GB
 rails-frontend-image                latest                 7282248e289c   12 minutes ago   1.54GB
@@ -1228,6 +1234,8 @@ https://github.com/docker/awesome-compose/blob/master/react-express-mongodb/comp
     image: bhattacharjeeabhinav/ecommerceapp:rails-frontend-image 
 >docker-compose up   //recreates/builds the container and runs 
 OR >docker run bhattacharjeeabhinav/ecommerceapp:rails-frontend-image   //image   
+//docker run -dp 0.0.0.0:3000:3000 YOUR-USER-NAME/getting-started
+
 >docker-compose ps
 >docker-compose images  //the docker compose is build only actually and when stop just stops the container
 
@@ -1246,8 +1254,21 @@ when we stop or remove containers,(like new images) only these containers are st
 >docker ps -a    //show all containers including stopped/exited
 >docker rm -f 7282248e289c   //containerid
           //to remove all containers(need to build again/pull from repo using docker run/ docker-compose up if already image not there in local)
+          (if a container is running, then we cant run the container again from same image on same vm port. we need to stop the container(so that the vm port gets free
+           but better is to stop and remove the container))
 >docker-compose rm  //remove all services and their containers
 
+
+In this section, you learned how to share your images by pushing them to a registry. 
+You then went to a brand new instance and were able to run the freshly pushed image. This is quite common in CI pipelines, 
+where the pipeline will create the image and push it to a registry and then the production environment can use the latest version of the image.
+
+
+>docker volume create todo-db
+>docker run -dp 127.0.0.1:3000:3000 --mount type=volume,src=todo-db,target=/etc/todos getting-started
+>docker volume inspect todo-db
+
+https://docs.docker.com/guides/workshop/04_sharing_app/
 
 
 
@@ -1259,6 +1280,7 @@ services:
     ports:
       - 3000:3000
          //container application connect and listen on this vm port and host port forwarded to vm port so that public internet traffic also connect
+         //127.0.0.1:3000:3000    host interface:port to vm port(container implicit)
     stdin_open: true
     volumes:
       - ./frontend:/usr/src/app
@@ -1291,13 +1313,14 @@ services:
     volumes:
       - mongo_data:/data/db           
          //container taking data from the docker vm created volume on vm, instead of the vm default directory (which in turn taken from host but that not confogured here)
+         //the volume is loaded as file system on the container
     networks:
       - express-mongo
          //internal container network etc firewall must be open for this service
     expose:
       - 27017
          //just container application connect and listen on this vm port, so that containers can talk to other containers in the vm
-networks:
+networks:               ///networks is like namespace, services subscribed to this tag can talk to all the other services in that network, no firewall etc.
   react-express:
   express-mongo:
 
