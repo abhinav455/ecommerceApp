@@ -1,0 +1,19 @@
+#this is a practise yaml file
+person:
+  name: "Odafe Idogho"
+  occupation: "Software Developer"
+  weakness: null
+  twin: false
+  cars: 1
+  hobbies:
+    - watching soccer
+    - coding
+    - travelling
+  teams: ["Chelseafc", "Real Madrid"]  
+  friends:
+    - name: "Ben"
+      age: 30
+    - {name: "John", age: 40}
+
+
+    

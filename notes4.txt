@@ -62,7 +62,7 @@ just create your own azure , aws, and gcp account and use in personal laptop
 
 
 
-----------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 AWS ECS is just a logical grouping (cluster) of EC2 instances, and all the EC2 instances part of an ECS act as Docker host i.e. 
 ECS can send command to launch a container on them (EC2). 
@@ -92,6 +92,10 @@ https://stackoverflow.com/questions/40575584/what-is-the-difference-between-amaz
 
 
 --------
+
+
+https://www.slideshare.net/brikis98/infrastructure-as-code-running-microservices-on-aws-using-docker-terraform-and-ecs?ref=http://www.ybrikman.com/writing/2016/03/31/infrastructure-as-code-microservices-aws-docker-terraform-ecs/#152
+https://github.com/abhinav455/abhinav455-infrastructure-as-code-talk-docker-terraform-aws.git
 
 actual tf.main :-
 
@@ -126,7 +130,7 @@ inside tf module .main :-
 
 # CREATE AN ECS SERVICE TO RUN A LONG-RUNNING ECS TASK
 # We also associate the ECS Service with an ELB, which can distribute traffic across the ECS Tasks.
-# ---------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------
 
 resource "aws_ecs_service" "service" {
   name = "${var.name}"
@@ -147,9 +151,9 @@ resource "aws_ecs_service" "service" {
   depends_on = ["aws_iam_role_policy.ecs_service_policy"]
 }
 
-# ---------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------
 # CREATE AN ECS TASK TO RUN A DOCKER CONTAINER
-# ---------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------
 
 resource "aws_ecs_task_definition" "task" {
   family = "${var.name}"
@@ -177,8 +181,11 @@ EOF
 
 
 In terraform providers
+---deploy
 1) Ecs_cluster manages each EC2 Instance that will run in the ECS Cluster
-2) Ecs_instance is like a aws host vm( based on customised packer like image launch configuration we mention in ecs_instance)
+
+    aws_autoscaling_group -   size = 6
+2) Ecs_instance/aws_launch_configuration is like a aws host vm( based on customised packer like image launch configuration we mention in ecs_instance)
          ecs_instance - image_id = "${data.aws_ami.ecs.id}" 
          data "aws_ami" "ecs" {  values = ["amzn-ami-*-amazon-ecs-optimized"],}   
          ecs_cluster manages this like t2.micro
@@ -187,10 +194,79 @@ In terraform providers
           all ecs_service managed by cluster ecs_cluster
 4) inside Ecs_service(docker vm) we create aws_ecs_task_definition(docker container/task)  (based on customised docker image we mention in aws_ecs_task_definition)
 
-  2.2) Ec2 is like a aws host vm thus needs ec2 packer image(like ecs_intance like t2 micro)
+  2.2) Ec2 is like a aws host vm thus needs ec2 packer image(like aws_launch_configuration like t2 micro)
 
 
+-----redeploy
+1)here whenever the docker image needs to be build again and put on dockerhub, 
+2)there are already running ecs cluster, ecs instances/host vm, running ecs services/docker vm
+  and inside that running containers. we just need to remove and again run/ compose-up the containers on aws using
+  ecs_cluster commands/ new terraform file mayb/ansible(configure)/ just for containers not provision  whole vms, clusters, load balancers etc.
+3)but just for easy way they told us to again terraform init,plan, apply to reprovision all infra and 
+   resources, will obviously then use need docker built images from the hub
+
+   3.2) all these steps can also automate with shell jenkins ci/cd scipts .yaml .sh
+export AWS_ACCESS_KEY_ID=...
+export AWS_SECRET_ACCESS_KEY=...
+vars.tf - main vars.tf tweak if want docker images and their ports just, 
+          the security, instance count/sizes etc in other modules
+>terraform init,plan,apply 
+init initializes the provider plugins and the modules, how our new infra looks like
+plan compares with old infra using old .tfstate file(stored in secure s3/blob), makes a plan how to create/update old infra
+    to see any changes that are required for your infrastructure
+apply makes the changes according to the plan
 
 
+>terraform plan -out tfplan
+      data.aws_subnet.default[2]: Read complete after 0s [id=subnet-0845d5267b4ec1b49]
+      data.aws_subnet.default[1]: Read complete after 0s [id=subnet-0d85a1d6e98337810]
+      module.rails_frontend.data.template_file.env_vars[0]: Reading...
+      module.rails_frontend.data.template_file.env_vars[0]: Read complete after 0s [id=187c415a5554e3f8f89a9a778ddcd5445a4df052ae28e1b501a6250a79b1220d]
+     
+      Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+        + create
+      <= read (data resources)
+      Terraform will perform the following actions:
+        # module.ecs_cluster.aws_autoscaling_group.ecs_cluster_instances will be created
+
+        # module.sinatra_backend_elb.aws_security_group_rule.all_outbound_all will be created
+        + resource "aws_security_group_rule" "all_outbound_all" {
+            + cidr_blocks              = [
+                + "0.0.0.0/0",
+              ]
+            + from_port                = 0
+            + id                       = (known after apply)
+            + protocol                 = "-1"
+            + security_group_id        = (known after apply)
+            + security_group_rule_id   = (known after apply)
+            + self                     = false
+            + source_security_group_id = (known after apply)
+            + to_port                  = 0
+            + type                     = "egress"
+          }
+
+      Plan: 25 to add, 0 to change, 0 to destroy.
+
+      Changes to Outputs:
+        + rails_frontend_url  = (known after apply)
+        + sinatra_backend_url = (known after apply)
+      ╷
+>terraform apply "./tfplan"
+
+
+Done with Docker, CI/CD(just shell scripts online shell) and Github(Dockerhub also same) at this point. 
+Cloud and TF also done(just shell scripts to configure and provision infra, instances, networks for deploy etc)
+    
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+hypervisor vm for each application before vm.
+application in a  vm will be restricted/dependent on the os and libraries of the os(os+libraries+app)
+
+thus instead of many vm/os for each app, we have one single docker server virtual vm(thus same OS across all apps) running each app in a isolated container(libraries+app) with all
+libraries installed
+
+yaml,xml, json data serializer language
+yaml files for containers and github actions ci/cd
 
 
