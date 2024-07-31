@@ -1,0 +1,14 @@
+FROM node:14.8.0-alpine
+
+WORKDIR /client  
+#workdir for add, copy, cmd, entrypoint, run instructions that follow like cd inside container
+#no need to configure env as our host env loaded automatically
+
+COPY ./package.json ./    
+#copy to ./client in container from vm ./package.json current dir
+
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "start"]

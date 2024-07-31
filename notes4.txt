@@ -269,4 +269,80 @@ libraries installed
 yaml,xml, json data serializer language
 yaml files for containers and github actions ci/cd
 
+-------
+Building for production  //while dev build and run at the same time
+>npm run build //>npx react-scripts build
+
+    File sizes after gzip:
+
+      278.43 kB  build\static\js\main.6681b3c8.js
+      28.45 kB   build\static\css\main.feaf2411.css
+
+    The project was built assuming it is hosted at /.
+    You can control this with the homepage field in your package.json.
+
+    The build folder is ready to be deployed.
+    You may serve it with a static server:
+
+      npm install -g serve
+      serve -s build
+
+    Find out more about deployment here:
+
+      https://cra.link/deployment
+
+in production, just add the built bundle.js and bundle.css code build using webpack etc as just serve using a static server
+no need to do npm run start as does both 1)build again and again before running in prod and 2)servers using react cra server
+
+after build we dont need cra server(although can use), can use vite/nginx for static serve
+
+building better in prod as optimised build and can use any server and dont need to build and run at same time but one after another
+
+
+CMD ["npm", "run", "server"] #not using nginx but our own cra static server to serve 
+
+for nginx, in same dockerfile add -  
+# production environment
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+Here, we take advantage of the multistage build pattern to create a temporary image used for building the artifact – the production-ready React static files 
+– that is then copied over to the production image. The temporary build image is discarded along with the original files and folders associated with the image. 
+This produces a lean, production-ready image.
+
+
+>docker build -f Dockerfile.prod -t sample:prod .
+>docker run -it --rm -p 1337:80 sample:prod
+
+---
+in docker-compose, not necessary to use an already build image, can build from dokcerfile and run at same time(anyways iterative build from our built image in docker-compose only)
+(instead of building from our built image, building from alpine base image)
+
+version: '3.7'
+
+services:
+
+  sample-prod:
+    container_name: sample-prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod      //building again from dockerfile instead of using prebuilt image
+    ports:
+      - '1337:80'
+
+>docker-compose -f docker-compose.prod.yml up -d --build      
+----------
+
+dotenv module loads the variables from .env file into process.env module
+require("dotenv").config();  //console.log(process.env.MY_NAME)
+
+
+
+
+
+
+
 
