@@ -1,11 +1,19 @@
 version: '3'
 services:
+  server:
+    image: bhattacharjeeabhinav/ecommerceapp:server
+    ports:
+      - "5000:5000" 
+    environment:
+      - MONGO_URI=${MONGO_URI}  
   client:
     build:
       dockerfile: Dockerfile.dev
-      context: ./   
+      context: ./
+    depends_on:    #dont want to run container client before server 
+      - server    
     volumes:
-      - ./node_modules:/client/node_modules  
-      - ./:./client
+      #- ./node_modules:/client/node_modules  
+      - ./:/client
     ports:
       - "3000:3000"  

@@ -586,6 +586,10 @@ Create a new repository on GitHub.com.  and copy its url (this is manual step)
 >git pull
 
 Github authorizes vscode using oauth to access my data (grant and access token, auth and resource server). thus vscode able to see my repo.
+
+>git rm -rf --cached . //remove all files in local repo and add them back respecting rules in gitignore     
+>git add .
+
 ----------------------------------------------------------------------------------------------------------------------       
 
 

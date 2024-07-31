@@ -1,0 +1,14 @@
+version: "3"
+services:
+  server:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./
+    volumes:
+    #  - ./node_modules:/server/node_modules
+      - ./:/server
+    environment:
+      - DB_PROD=${DB_PROD}
+       #no need to get env from host and getting from .env file which is loaded with current dir from host to vm
+    ports:
+      - "5000:5000"

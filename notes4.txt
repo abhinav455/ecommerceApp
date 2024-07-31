@@ -334,10 +334,23 @@ services:
       - '1337:80'
 
 >docker-compose -f docker-compose.prod.yml up -d --build      
+
+>docker run imagename ls //runs containers and lists all filesystem in it like we are in the terminal of container -it -tty like, but background only -d
+>docker-compose build //buid image from dockerfile mentioned in docker-compose file 
+>docker-compose down //delete the built image
+
+>docker-compose up   //automatially detects the built image
+>docker-compose run server sh  //goes into container shell
+
+node_modules in windows wont work in dockercontainer linux need to reinstall
 ----------
 
 dotenv module loads the variables from .env file into process.env module
 require("dotenv").config();  //console.log(process.env.MY_NAME)
+
+------
+depends_on:    #dont want to run container client before server 
+  - server
 
 
 
