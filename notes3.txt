@@ -1340,6 +1340,7 @@ volumes:
 
 
 https://github.com/docker/awesome-compose/blob/master/react-express-mongodb/compose.yaml
+https://mherman.org/blog/dockerizing-a-react-app/
 ----------------------------------------------------------------------------------------------------------------------------------------
 
 

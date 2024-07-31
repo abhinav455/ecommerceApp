@@ -352,6 +352,14 @@ require("dotenv").config();  //console.log(process.env.MY_NAME)
 depends_on:    #dont want to run container client before server 
   - server
 
+------------------------
+
+ci/cd (.sh .yaml) 
+1) push to github, github action/jenkins/ci-cd listens
+2)github action build image from githhub and push to dockerhub
+3)github action make gcp pull from dockerhub by running docker-compose up again on vm
+   / or provision all infa again using terraform init/plan/apply
+
 
 
 
