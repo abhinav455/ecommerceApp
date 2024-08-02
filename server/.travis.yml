@@ -1,0 +1,24 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t bhattacharjeeabhinav/ecommerceapp:server -f Dockerfile.dev .
+   #or docker pull and docker run, 
+      #thus the ci/cd tool/plugin needs to support docker
+
+#script: 
+   #exec commands to be done in container
+
+
+#deploy to hub
+deploy:
+  provider: script
+  script: bash docker_push
+  #docker is a script in repo containenint 
+  #!/bin/bash ; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ; docker push USER/REPO
+  on:
+    branch: master
+
+   

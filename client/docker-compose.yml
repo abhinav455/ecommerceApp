@@ -1,7 +1,7 @@
 version: '3'
 services:
   server:
-    image: bhattacharjeeabhinav/ecommerceapp:server
+    image: bhattacharjeeabhinav/ecommerceapp:server   #either give build:(takes prebuilt image from context or builds again) or which image:(pulls prebuilt image)
     ports:
       - "5000:5000" 
     environment:
@@ -9,11 +9,11 @@ services:
   client:
     build:
       dockerfile: Dockerfile.dev
-      context: ./
+      context: ./       #already built image in local is there in our context local thus doesnt build again     #building again from dockerfile if not already prebuilt image
     depends_on:    #dont want to run container client before server 
       - server    
     volumes:
-      #- ./node_modules:/client/node_modules  
+      #- ./node_modules:/client/node_modules  #node_modules differetn for differetn os/arch
       - ./:/client
     ports:
       - "3000:3000"  

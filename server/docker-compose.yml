@@ -3,7 +3,7 @@ services:
   server:
     build:
       dockerfile: Dockerfile.dev
-      context: ./
+      context: ./    #already built image in local is there in our context local thus doesnt build again
     volumes:
     #  - ./node_modules:/server/node_modules
       - ./:/server

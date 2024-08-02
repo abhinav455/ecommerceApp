@@ -328,8 +328,8 @@ services:
   sample-prod:
     container_name: sample-prod
     build:
-      context: .
-      dockerfile: Dockerfile.prod      //building again from dockerfile instead of using prebuilt image
+      dockerfile: Dockerfile.dev
+      context: ./    #already built image in local is there in our context local thus doesnt build again     #building again from dockerfile if not already prebuilt image
     ports:
       - '1337:80'
 
@@ -361,9 +361,66 @@ ci/cd (.sh .yaml)
    / or provision all infa again using terraform init/plan/apply
 
 
+1)Jenkins if run in cloud then can run in local also(can connect to internet from local like push dockerhub/ terraform on aws) 
+and pull from git-build-push to dockerhub, pull from dockerhub-push to gcp with gcp tokens and api
+
+2)thus jenkins allows using local also, but travis only allows on cloud(local is paid) but for production
+need cloud only as we dont maintain our server. 
+(or can run jenkins locally on any gcp vm like servicenow runs its own local jenkins controller on vm)
+
+
+normal actions build/imoprt from marketplace OR pipelines for complex steps
+
+3)shipping apps to production just means ship our code files and a command to run them (done in dockerfile)
+  and the infra we get from containers/vm
+
+
+-----------
+jenkins stage(many steps) like describe(many tests) in jest/playwright/cypress
+
+build - a group of jobs that run in sequence. 
+stage - a group of jobs that run in parallel as part of a sequential build process composed of multiple stages
+job - an automated process that clones your repository into a virtual environment and then carries out a series of phases such as compiling your code, running tests, etc. 
+A job fails, if the return code of the script phase is non-zero
+phase - the sequential steps of a job. For example, the install phase, comes before the script phase, which comes before the optional deploy phase.
+
+
+Travis CI doesnt use github ssh like local jenkins, but uses oauth access tokens from github 
+resource server to pull the repo code/files.
+thus travis better for github as oauth also configure once for online travis server
+
+Travis CI’s system clones a repository, from which the build is triggered, to the build environment. 
+The build environment is an isolated virtual machine or an LXD container, which gets terminated as soon as the build finishes.
 
 
 
 
+
+----------------
+You need to add .travis.yml configuration file to root
+directory of your repository. If a .travis.yml is not in your
+repository or is not a valid YAML, Travis CI will ignore.it
+
+Once you've added .travis.yml to your repo, all you
+need to do now is commit your changes and push
+them to the repository(means initial listening step on push already configured on travis for the particular repo)
+
+configure when to trigger build on travis on github commit, pull request, new branch
+via ui only.
+but what to do when build starts add to travis.yml file in your repo
+
+test script in ci/cd to make sure the application built via ci/cd is running properly
+ >npm test or  >npm run jest// we are using mocha(nyc-mocha on top)
+ "scripts":
+    "test": "DEBUG=true nyc mocha ./test/**/**/*.test.js --exit --inspect=0.0.0.0:9292 --timeout=12000
+         
+
+mostly all .sh fies in our repo as the files run by the ci/cd during 
+  deployment process and not directly used by our app
+
+
+  "devDependencies": { /*ENV NODE_ENV=production in Dockerfile*/
+    "nodemon": "^3.1.3"
+  }
 
 
