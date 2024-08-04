@@ -8,9 +8,9 @@ before_install:
    #or docker pull and docker run, 
       #thus the ci/cd tool/plugin needs to support docker
 
-#script: 
+script: 
    #exec commands to be done in container
-
+  - docker run bhattacharjeeabhinav/ecommerceapp:server npm run test -- --coverage 
 
 #deploy to hub
 deploy:

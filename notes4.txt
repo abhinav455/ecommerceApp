@@ -375,7 +375,28 @@ normal actions build/imoprt from marketplace OR pipelines for complex steps
   and the infra we get from containers/vm
 
 
------------
+-------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------
+
+
 jenkins stage(many steps) like describe(many tests) in jest/playwright/cypress
 
 build - a group of jobs that run in sequence. 
@@ -415,12 +436,33 @@ test script in ci/cd to make sure the application built via ci/cd is running pro
     "test": "DEBUG=true nyc mocha ./test/**/**/*.test.js --exit --inspect=0.0.0.0:9292 --timeout=12000
          
 
-mostly all .sh fies in our repo as the files run by the ci/cd during 
+mostly all .sh files in our repo as the files run by the ci/cd during 
   deployment process and not directly used by our app
+ script: bash docker_push
+  #docker is a script in repo containenint 
+  #!/bin/bash ; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ; docker push USER/REPO  
 
 
-  "devDependencies": { /*ENV NODE_ENV=production in Dockerfile*/
+  "devDependencies": { /*ENV NODE_ENV=production in Dockerfile*/  //while running npm install it checks NODE_ENV
     "nodemon": "^3.1.3"
   }
 
+
+ --------------------
+
+testing framework can be of 2 types - 
+1) unit testing on node nev - import any library and its fns and check the expected output uses the same enviroment where testing server is running. 
+         you dont need browser/page fns and libraries for these
+2) end to end testing opens a browser and page instance and navigates to a url(public or localhost url(frontend/backend server hosting bundlejs and running on another terminal/process))
+        the web server running another process/environment
+
+docker run bhattacharjeeabhinav/ecommerceapp:server npm run test -- --coverage   //run npm start(already mentioned in dockerfile is ignored) and npm test(command passed as params) is run
+                                                                                         //-- --coverage so that runs and exits the container
+ 
+IMP - 1)volume is mounted before CMD is run in docker and docker-compose (even if already built file and built only till before CMD)
+      2)thus rest everything use RUN command as used to specify steps during build process. CMD to specify default cmd to run when docker container is run, not a part of build process, 
+          runs after new mount. ENTRYPOINT same as CMD, just that if params in docker-run cmd, then entrypoint not ignored like cmd, but first run and then the params passed cmd run.
+
+
+  
 
