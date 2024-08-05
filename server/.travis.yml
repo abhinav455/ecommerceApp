@@ -1,24 +1,31 @@
 sudo: required
 
 services:
-  - docker
+  - docker   #runs $sudo systemctl start docker in job shell
 
 before_install:
-  - docker build -t bhattacharjeeabhinav/ecommerceapp:server -f Dockerfile.dev .
+  - docker build -t "$DOCKER_ID"/ecommerceapp:server -f Dockerfile.dev .
    #or docker pull and docker run, 
       #thus the ci/cd tool/plugin needs to support docker
 
 script: 
    #exec commands to be done in container
-  - docker run bhattacharjeeabhinav/ecommerceapp:server npm run test -- --coverage 
+  - docker run "$DOCKER_ID"/ecommerceapp:server npm run test -- --coverage 
+
+after_sucess:
+  #build production grade dockerfile
+  - docker build -t "$DOCKER_ID"/ecommerceapp:server .
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin 
+  - docker push "$DOCKER_ID"/ecommerceapp:server   
+
 
 #deploy to hub
-deploy:
-  provider: script
-  script: bash docker_push
+#deploy:
+#  provider: script
+#  script: bash docker_push
   #docker is a script in repo containenint 
   #!/bin/bash ; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin ; docker push USER/REPO
-  on:
-    branch: master
+#  on:
+#    branch: master
 
    

@@ -402,7 +402,8 @@ jenkins stage(many steps) like describe(many tests) in jest/playwright/cypress
 build - a group of jobs that run in sequence. 
 stage - a group of jobs that run in parallel as part of a sequential build process composed of multiple stages
 job - an automated process that clones your repository into a virtual environment and then carries out a series of phases such as compiling your code, running tests, etc. 
-A job fails, if the return code of the script phase is non-zero
+A job fails, if the return code of the script phase is non-zero. 
+   if all code run successfulyy then job passed like in >docker run -- --coverage run successfully, coverage for mocha pass arguments
 phase - the sequential steps of a job. For example, the install phase, comes before the script phase, which comes before the optional deploy phase.
 
 
@@ -424,11 +425,17 @@ repository or is not a valid YAML, Travis CI will ignore.it
 
 Once you've added .travis.yml to your repo, all you
 need to do now is commit your changes and push
-them to the repository(means initial listening step on push already configured on travis for the particular repo)
+them to the repository(means initial listening step on push already configured on travis for the particular repo/ or github webhook configure to call travis)
 
 configure when to trigger build on travis on github commit, pull request, new branch
 via ui only.
 but what to do when build starts add to travis.yml file in your repo
+
+services:
+  - docker   #runs $sudo systemctl start docker in job shell
+$ git clone --depth=50 --branch=main https://github.com/abhinav455/e-commerce-server.git abhinav455/e-commerce-server  #default
+
+
 
 test script in ci/cd to make sure the application built via ci/cd is running properly
  >npm test or  >npm run jest// we are using mocha(nyc-mocha on top)
@@ -456,6 +463,8 @@ testing framework can be of 2 types -
 2) end to end testing opens a browser and page instance and navigates to a url(public or localhost url(frontend/backend server hosting bundlejs and running on another terminal/process))
         the web server running another process/environment
 
+
+---------------
 docker run bhattacharjeeabhinav/ecommerceapp:server npm run test -- --coverage   //run npm start(already mentioned in dockerfile is ignored) and npm test(command passed as params) is run
                                                                                          //-- --coverage so that runs and exits the container
  
@@ -463,6 +472,33 @@ IMP - 1)volume is mounted before CMD is run in docker and docker-compose (even i
       2)thus rest everything use RUN command as used to specify steps during build process. CMD to specify default cmd to run when docker container is run, not a part of build process, 
           runs after new mount. ENTRYPOINT same as CMD, just that if params in docker-run cmd, then entrypoint not ignored like cmd, but first run and then the params passed cmd run.
 
+--------------
 
-  
+#instead of password file, add env variable in travis to get DOCKER_PASSWORD
+using STDIN prevets password from ending up in shell's history. pipe the stdin docker hub password
+  #!/bin/bash ; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin ; docker push USER/REPO
+
+
+env file not pushing to github. so in gcp the docker container wont have env file so app wont work.
+1) just like travis, create env variables in all cloud resources like google cloud/github(settings->secrets if used github actions)/travis
+2) push encrypted env vars by openssl and decrypt those from file in gcp container at runtime(in node code only decrypt using openssl)
+
+A)rsa - encrypt and decrypt ; public and private key factoring primes, asymmetric (p,q,t) (e,d,n)
+B)md5/sha/bcrypt(salt and exponent) - encrypt using irreversible hash; block bitshift and xor (used to encrypt aes session symmetric key transfer during ssl)
+C)aes - encryt and decrypt, symmetric; same key for both encryption and decryption, 4x4 grid transpose matrix multiply, then the 2nd matrix is key, A*A=I means A=A^(-1), A=key is the root 
+                                          (xor, substitute, permute rowns and columns, add round key; key expanded and changed for every round), decrypt also same
+
+
+echo 'test'> text.txt //write
+echo 'test'>> text.txt //append
+
+
+
+
+
+
+
+
+
+
 
