@@ -1,0 +1,17 @@
+sudo:
+  required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t ${DOCKER_ID}/ecommerceapp:client -f Dockerfile.dev .
+
+script:
+  - docker run -e CI=true ${DOCKER_ID}/ecommerceapp:client npm test -- --coverage
+
+after_sucess:
+  #build production grade dockerfile
+  - docker build -t "$DOCKER_ID"/ecommerceapp:client .
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin 
+  - docker push "$DOCKER_ID"/ecommerceapp:client     

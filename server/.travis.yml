@@ -14,6 +14,7 @@ script:
 
 after_sucess:
   #build production grade dockerfile
+  - openssl  enc -aes256 -d -in .enc -out .env -k $SECRET_KEY
   - docker build -t "$DOCKER_ID"/ecommerceapp:server .
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin 
   - docker push "$DOCKER_ID"/ecommerceapp:server   

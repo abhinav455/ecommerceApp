@@ -371,7 +371,7 @@ need cloud only as we dont maintain our server.
 
 normal actions build/imoprt from marketplace OR pipelines for complex steps
 
-3)shipping apps to production just means ship our code files and a command to run them (done in dockerfile)
+3)shipping apps to production just means ship our code files and a command to run them and standardised infra (done in dockerfile)
   and the infra we get from containers/vm
 
 
@@ -435,6 +435,9 @@ services:
   - docker   #runs $sudo systemctl start docker in job shell
 $ git clone --depth=50 --branch=main https://github.com/abhinav455/e-commerce-server.git abhinav455/e-commerce-server  #default
 
+IMP----
+   local->github(push files)->travis(create docker image with files / github-dockerhub giving their own connect ci/cd for these tasks)->dockerhub->travis/terraform  
+      ->gcp(travis restart gcp docker-compose(but travis is a local/cloud shell thus will use gcp api/cli inside its shell) / terraform pull image and provision vms and containers again)
 
 
 test script in ci/cd to make sure the application built via ci/cd is running properly
@@ -453,6 +456,10 @@ mostly all .sh files in our repo as the files run by the ci/cd during
   "devDependencies": { /*ENV NODE_ENV=production in Dockerfile*/  //while running npm install it checks NODE_ENV
     "nodemon": "^3.1.3"
   }
+
+-----------------------------------------------------------------------------------------
+
+
 
 
  --------------------
@@ -478,6 +485,7 @@ IMP - 1)volume is mounted before CMD is run in docker and docker-compose (even i
 using STDIN prevets password from ending up in shell's history. pipe the stdin docker hub password
   #!/bin/bash ; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin ; docker push USER/REPO
 
+ script step tells steps of travis that need to pass for job to be successful
 
 --------
 
@@ -495,14 +503,35 @@ echo 'test'> text.txt //write
 echo 'test'>> text.txt //append
 
 > \"Program Files"\Git\usr\bin\openssl 
->openssl enc -aes256 -e -in testscript.txt -out cipher -k password1
->openssl enc -aes256 -d -in cipher -out testscript2.txt -k password1 
+>openssl enc -aes256 -e -in .env -out .enc -k password1
+>openssl enc -aes256 -d -in .enc -out .env -k password1 
 
 decrypt in gcp/travis ci, just need to create one env var i.e our aes key
 
+bgz8xe95dTeftkB - pass
 
+-------------------------------------
 
+react tests, >react-scripts test, its own testing framework of cra/react like , 
+dont need jest/mocha other testing libraries for node as react itself good library for test also(uses jest only under) 
+import App from "../App";  
+   //doing unit testing thus need to import the files as running test in same node environment
+      //and not e2e test on browser using browser/page instances and navigating to localhost page hosted by another server process
 
+Basically, jest runs on Node.js environment, so it uses modules following the CommonJS. If you want to use axios up to 1.x.x, you have to transpile the JavaScript module from ECMAScript type to CommonJS type. 
+Jest ignores /node_modules/ directory to transform basically.
+runs our test and also react prebuilt tests for all files and components
+
+>npm install serve  //server production built react static files
+>npm run build
+ "build": "react-scripts build"
+ "server" : "serve -s build"
+>npm run server 
+
+By default, serve will listen on 0.0.0.0:3000 and serve the
+current working directory on that address
+
+-----------------------------------------
 
 
 
