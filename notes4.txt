@@ -472,12 +472,14 @@ IMP - 1)volume is mounted before CMD is run in docker and docker-compose (even i
       2)thus rest everything use RUN command as used to specify steps during build process. CMD to specify default cmd to run when docker container is run, not a part of build process, 
           runs after new mount. ENTRYPOINT same as CMD, just that if params in docker-run cmd, then entrypoint not ignored like cmd, but first run and then the params passed cmd run.
 
---------------
 
+----------
 #instead of password file, add env variable in travis to get DOCKER_PASSWORD
 using STDIN prevets password from ending up in shell's history. pipe the stdin docker hub password
   #!/bin/bash ; echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin ; docker push USER/REPO
 
+
+--------
 
 env file not pushing to github. so in gcp the docker container wont have env file so app wont work.
 1) just like travis, create env variables in all cloud resources like google cloud/github(settings->secrets if used github actions)/travis
@@ -492,7 +494,11 @@ C)aes - encryt and decrypt, symmetric; same key for both encryption and decrypti
 echo 'test'> text.txt //write
 echo 'test'>> text.txt //append
 
+> \"Program Files"\Git\usr\bin\openssl 
+>openssl enc -aes256 -e -in testscript.txt -out cipher -k password1
+>openssl enc -aes256 -d -in cipher -out testscript2.txt -k password1 
 
+decrypt in gcp/travis ci, just need to create one env var i.e our aes key
 
 
 
