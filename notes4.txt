@@ -503,8 +503,8 @@ echo 'test'> text.txt //write
 echo 'test'>> text.txt //append
 
 > \"Program Files"\Git\usr\bin\openssl 
->openssl enc -aes256 -e -in .env -out .enc -k password1
->openssl enc -aes256 -d -in .enc -out .env -k password1 
+>openssl enc -aes256 -e -in .env -out .enc -k password1 -md sha256
+>openssl enc -aes256 -d -in .enc -out .env -k password1 -md sha256  //message digest sha256 or md5
 
 decrypt in gcp/travis ci, just need to create one env var i.e our aes key
 
@@ -533,6 +533,65 @@ current working directory on that address
 
 -----------------------------------------
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------
+
+
+GCP
+
+Gcp sdk OR cli for ci/cd .sh scripts to provision and configure vms vnets policies elbs etc. but also to ssh into vms and run containers. Or without ssh use thier ecs
+cli, rest api, sdk
+npm install --save @google-cloud/pubsub
+
+App Engine is a fully managed, serverless platform for developing and hosting web applications at scale. 
+You can choose from several popular languages, libraries, and frameworks to develop your apps, and then
+ let App Engine take care of provisioning servers and scaling your app instances based on demand.
+
+thus serverless main feature. other way is to use Create a client-server application on Compute Engine 2 vms
+connect to the app using client-vm-public-ip:port normally
+
+If you want to terminate this service you can run the following command during an ssh session logged in to the client VM:
+kill -9 $(sudo lsof -i :80 | grep \
+    main | awk '{print $2}' )
+
+
+create a service account on gcp to connect to cloud and use its password in travis.
+service account - eshop
+
+like a private key, serviceAccount.json.
+when we connect to cloud to a project, the cloud looks inside the project to see if this account has the authorzation policy
+same like .env .enc. use openssl aes to push encrypted serviceAccount.json.enc to github. and then delete the file from your system also. for both client and server repos
+ and add SERVICE_KEY env in travis
+
+
+-------
+eshop-431807
+Travis will deploy the container to gcp and new app instance of gcp will be created
+
+travis.yml
+Need to run gcp interactive commands in a non interactive way travis - CLOUDSDK_CORE_DISABLE_PROMPTS=1 (accepts all default interactive)
+
+curl https://sdk.cloud.google.com(gets all the bash commands to install gcp script.sh) | bash (pipe it to bash, bash will run those commands)
+//#!/bin/bash URL=https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash function download { scratch="$(mktemp -d -t tmp.XXXXXXXXXX)" || exit script_file="$scratch/install_google_cloud_sdk.bash" echo "Downloading Google Cloud SDK install script: $URL" curl -# "$URL" > "$script_file" || exit chmod 775 "$script_file" echo "Running install script from: $script_file" "$script_file" "$@" } download "$@"
+
+
+C:\Users\AbhinavBhattacharjee\AppData\Local\Google\Cloud SDK
 
 
 
