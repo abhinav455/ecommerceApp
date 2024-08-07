@@ -4,20 +4,44 @@ services:
   - docker   #runs $sudo systemctl start docker in job shell
 
 before_install:
+  #decrypt env vars 
+  - openssl  enc -aes256 -d -in .enc -out .env -k $SECRET_KEY -md sha256
+
   - docker build -t "$DOCKER_ID"/ecommerceapp:server -f Dockerfile.dev .
    #or docker pull and docker run, 
       #thus the ci/cd tool/plugin needs to support docker
 
 script: 
    #exec commands to be done in container
+
   - docker run "$DOCKER_ID"/ecommerceapp:server npm run test -- --coverage 
 
 after_sucess:
+  - openssl  enc -aes256 -d -in serviceAccount.json.enc -out serviceAccount.json -k $SERVICE_KEY -md sha256 
+
+  #install gcp sdk, delete old ones
+  - if [! -d "$HOME/google-cloud-sdk/bin"]; then rm -rf $HOME/google-cloud-sdk; export 
+    CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
+  #after installing, set the env in current travis shell
+  - source /home/travis/google-cloud-sdk/path.bash.inc
+  
+  #can use gcloud commands now
+  - gcloud auth activate-service-account --key-file serviceAccount.json  #instead of logging in via oauth our owner account
+  - gcloud config set project eshop-431807
+  - gcloud config set compute/zone us-west2-a
+   
+
   #build production grade dockerfile
-  - openssl  enc -aes256 -d -in .enc -out .env -k $SECRET_KEY -md sha256
   - docker build -t "$DOCKER_ID"/ecommerceapp:server .
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin 
   - docker push "$DOCKER_ID"/ecommerceapp:server   
+
+  #deploy to gcp
+   # - gcloud deploy app #deploys the current directory all files
+      #(uses the app.yml file to know which command to run and env to run on -node/python etc)
+  
+  - bash ./deploy.sh
+
 
 
 #deploy to hub

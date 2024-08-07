@@ -559,6 +559,11 @@ Gcp sdk OR cli for ci/cd .sh scripts to provision and configure vms vnets polici
 cli, rest api, sdk
 npm install --save @google-cloud/pubsub
 
+C:\Users\AbhinavBhattacharjee\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin\
+>gcloud auth list
+>gcloud config list
+>gcloud app versions list
+
 App Engine is a fully managed, serverless platform for developing and hosting web applications at scale. 
 You can choose from several popular languages, libraries, and frameworks to develop your apps, and then
  let App Engine take care of provisioning servers and scaling your app instances based on demand.
@@ -574,7 +579,7 @@ kill -9 $(sudo lsof -i :80 | grep \
 create a service account on gcp to connect to cloud and use its password in travis.
 service account - eshop
 
-like a private key, serviceAccount.json.
+like a private key, serviceAccount.json. //json includes project, user other info fields and private key field also
 when we connect to cloud to a project, the cloud looks inside the project to see if this account has the authorzation policy
 same like .env .enc. use openssl aes to push encrypted serviceAccount.json.enc to github. and then delete the file from your system also. for both client and server repos
  and add SERVICE_KEY env in travis
@@ -590,8 +595,28 @@ Need to run gcp interactive commands in a non interactive way travis - CLOUDSDK_
 curl https://sdk.cloud.google.com(gets all the bash commands to install gcp script.sh) | bash (pipe it to bash, bash will run those commands)
 //#!/bin/bash URL=https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash function download { scratch="$(mktemp -d -t tmp.XXXXXXXXXX)" || exit script_file="$scratch/install_google_cloud_sdk.bash" echo "Downloading Google Cloud SDK install script: $URL" curl -# "$URL" > "$script_file" || exit chmod 775 "$script_file" echo "Running install script from: $script_file" "$script_file" "$@" } download "$@"
 
+zsh for mac, bash for linux , sh for linux(bash is sh+more features) !#/bin/bash
 
-C:\Users\AbhinavBhattacharjee\AppData\Local\Google\Cloud SDK
+PATH="dir:$PATH", you are effectively adding dir to the beginning of the PATH variable, each path  separated by :
+if [-f path_to_file];  then  . 'path_to_file'; fi  
+        //-f checks if the path exists and is a regular file 
+        // . in bash is shorthand for source command, runs script in current shell env (any env or fn defined in it will be present in current shell)
+        //-d checks if the directory exists
+        //rm -rf; rm means delete, -r means recursively delete subfolders and files, -f means force delete all even write protected and dont ask for user confirmation
+
+
+IMP - in .travis.yml, current directory is the directory in which we do git clone(we do gitclone and cd into the cloned directory first, travis does implicit)
+---
+
+  - gcloud auth activate-service-account --key-file serviceAccount.json  #instead of logging in via oauth our owner account
+
+  # - gcloud deploy app #deploys the current directory all files
+    #(uses the app.yml file to know which command to run and env to run on -node/python etc)
+
+- bash ./deploy.sh  //remove old deployments else - gcloud deploy app , everytime creates a new app instance on the container/vm/ec2/compute instance
+ 1)get list of all deployment options
+
+
 
 
 
