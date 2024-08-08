@@ -603,6 +603,11 @@ if [-f path_to_file];  then  . 'path_to_file'; fi
         // . in bash is shorthand for source command, runs script in current shell env (any env or fn defined in it will be present in current shell)
         //-d checks if the directory exists
         //rm -rf; rm means delete, -r means recursively delete subfolders and files, -f means force delete all even write protected and dont ask for user confirmation
+eval $command  //evaluates/run in another shell maybe whatever
+ echo "${array[@]}" #return //expands all elements in array as separate arguments
+  $() syntax is used for command substitution and not for array indexing ${array[$i]}
+    local gcloud="$(gcloud app versions list)"
+
 
 
 IMP - in .travis.yml, current directory is the directory in which we do git clone(we do gitclone and cd into the cloned directory first, travis does implicit)
@@ -615,9 +620,39 @@ IMP - in .travis.yml, current directory is the directory in which we do git clon
 
 - bash ./deploy.sh  //remove old deployments else - gcloud deploy app , everytime creates a new app instance on the container/vm/ec2/compute instance
  1)get list of all deployment options
+    >gcloud app versions list
+ 2)remove older deployments
+    >gcloud -q app versions delete $version
+ 3)deploy the new app 
+    >gcloud app deploy --stop-previous-version
+                #deploys using the app.yml file in the current directory like docker-compose.yml, take all current directory files 
+                #stop current not fully deployed also
+                #it sees the docker-compose file thus runs the env as containers looking at it
+------
+
+#################
+The dispatch.yaml allows you to override routing rules. 
+You can use the dispatch.yaml to send incoming requests to a specific service (formerly known as modules) based on the path or hostname in the URL.
+>gcloud app deploy dispatch.yaml
+
+dispatch:
+  # Default service serves the typical web resources and all static resources.
+  - url: "*/favicon.ico"
+    service: default
+  - url: "*/mobile/*"
+    service: mobile-frontend  
+
+cron.yaml like app.yaml
+A cron job makes a scheduled HTTP GET request to the specified endpoint in the same app where the cron job is configured. The handler for that endpoint executes the logic when it is called.
+The App Engine Cron Service cannot be used to call web endpoints outside the App Engine host app. It cannot be used to call App Engine endpoints from other apps besides the host app.
+cron:
+  - description: "daily summary job"
+    url: /tasks/summary
+    schedule: every 24 hours
+##################
 
 
-
-
+app.yaml
+https://cloud.google.com/appengine/docs/flexible/reference/app-yaml?tab=node.js#top
 
 

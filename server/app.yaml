@@ -1,0 +1,7 @@
+env: flex
+runtime: custom #not nodejs as we are running container in docker, setup everything in dockerfile
+service: default
+manual_scaling:
+  instances: 1
+resources:
+  cpu: 1

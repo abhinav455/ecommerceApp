@@ -17,6 +17,6 @@ ENV NODE_ENV=production
 
 EXPOSE 8080
 
-CMD ["npm", "start"]    
+CMD ["npm", "run", "server"]    
           #["npm", "run", "server"] #
           #normal node server instead of nginx. buil and run both

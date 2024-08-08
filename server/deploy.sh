@@ -4,7 +4,7 @@
 
 echo "Deploying eShop/server to google cloud \n"
 
-#Returns a list of all gcloud deployment versions
+#FN Returns a list of all gcloud deployment versions
 gcloud_list() {
     local gcloud="$(gcloud app versions list)"
     local array=()
@@ -12,11 +12,27 @@ gcloud_list() {
     do
      array+=($word)
     done
-    echo "${array[@]}" 
+    echo "${array[@]}" #return 
 }
 
-# Deletes unnecessary deployments that are not utilized
+# FN Deletes unnecessary deployments that are not utilized
 delete_version() {
-    local array=($@)
-    for 
+    local array=($@) #params
+    for ((i=0; i< ${#array[@]}; ++i)); do
+        if [[ ${array[$i]} == *"0.00"* ]]; then  #wildcard match any string containing 0.00
+            local version=${array[$i-1]}
+            local command="gcloud -q app versions delete $version"
+            eval $command
+        fi
+    done        
 }
+
+#execute fns
+list=$(gcloud_list)
+delete_version $list
+
+#deploy to google cloud provider
+gcloud app deploy --stop-previous-version 
+            #deploys using the app.yml file in the current directory like docker-compose.yml, take all current directory files 
+            #stop current not fully deployed also
+            #it sees the docker-compose file thus runs the env as containers looking at it
