@@ -1,10 +1,10 @@
 # !# /bin/bash -x
 
-#delete existing instances/deployments in the environment and the recreate/redeploy and run
+#delete existing instances/deployments in the environment and then recreate/redeploy and run
 
 echo "Deploying eShop/server to google cloud \n"
 
-3 Returns a list of all gcloud deployment versions
+#Returns a list of all gcloud deployment versions
 gcloud_list() {
     local gcloud="$(gcloud app versions list)"
     local array=()
