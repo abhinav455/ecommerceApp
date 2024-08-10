@@ -2,7 +2,26 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/authorization");
 const { check, validationResult } = require("express-validator");
+let multer = require("multer");
+const {Storage} = require("@google-cloud/storage");
 const Product = require("../models/Product");
+
+const memoryStorage = multer.memoryStorage;
+multer = multer({
+    storage:memoryStorage(),
+    limits: {
+        fileSize: 2*1024*1024*1024,
+    }
+});
+
+
+const storage = new Storage({
+    projectId: process.env.PROJECT_ID,
+    keyFilename: process.env.GCLOUD_KEY_FILE,
+});
+const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
+
+
 
 router.post(
     "/",
@@ -85,5 +104,58 @@ router.get("/instructors/:id", async(req, res) => {
          res.status(500).send("Server error");
     };
 });
+
+
+router.post("/upload/thumbnail", auth, multer.single("file"), async(req, res) => {
+    try{
+        if(!req.file){
+            res.status(400).send("No file uploaded");
+            return;
+        }
+
+        const id = req.user.id;
+        const {productId, multiple} = req.query;
+        
+        const blob = bucket.file(`${id}/${productId}/${req.file.originalname}`);
+        const blobStream = blob.createWriteStream();
+        blobStream.on('error', (err) => {
+            console.log(err);
+        });
+
+        blobStream.on("finish", async ()=> { //after finished uploading finish event called
+            //this public url can be used to directly access the file via http
+            // const publicUrl = format(
+            //     `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+            // );
+            // res.status(200).send(publicUrl);
+           
+            await blob.makePublic();
+
+            if(multiple){
+                await Product.findOneAndUpdate(
+                    {_id: productId}, 
+                    {$push: {images: blob.metadata.mediaLink}},  //get images and create set from array and then use $set so that no duplicate images
+                    {new: true, upsert: true},
+                );
+            }else{
+                await Product.findByIdAndUpdate(
+                    {_id: productId}, 
+                    {$set: {thumbnail: blob.metadata.mediaLink}},
+                    {new: true},
+                );
+            }
+
+            res.status(200).send({msg: `Successfully Uploaded ${req.file.originalname}`});
+        });
+
+        blobStream.end(req.file.buffer); //upload to the blob
+
+
+    } catch(error){
+         res.status(500).send("Server error");
+    };
+});
+
+
 
 module.exports = router;

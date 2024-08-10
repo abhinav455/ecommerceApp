@@ -1,0 +1,45 @@
+1)uploading file
+2)browser sends file information to server, 
+3)server uses middleware to process 
+4)server sends/saves to storage
+
+
+<input type="file" name="file" onclick="handleSubmit"/>
+handlesubmit(e){
+    e.target.files[0];
+}
+
+---
+express multer middleware to handle content-type: multipart/form-data  , mimetype: application/pdf or image/png
+>npm install multer --reg https://registry.npmjs.org/   //https://artifact.devsnc.com/content/groups/npm-all/
+
+  while publishing modules, in package.json 
+    {
+    "publishConfig": {
+        "registry": "http://myreg.npmjitsu.com"
+    }
+    }
+
+multer.memoryStorage - memorystorage engine stores files in memory as buffer objects
+save and extract buffer and save to gcp storage
+
+Multer adds a body object and a file or files object to the request object. The req.body object contains the values of the text fields of the form, 
+the req.file or files object contains the files uploaded via the form.
+
+multer.single("file")  - middleware
+console.log(req.file)
+{
+  fieldname: 'file',
+  originalname: 'Resume - Xinyu(Jack) Li_474CDA.pdf',
+  encoding: '7bit',
+  mimetype: 'application/pdf',
+  buffer: <Buffer 25 50 44 46 2d 31 2e 34 0a 25 d3 eb e9 e1 0a 31 20 30 20 6f 62 6a 0a 3c 3c 2f 54 69 74 6c 65 20 28 52 65 73 75 6d 65 20 2d 20 58 69 6e 79 75 5c 28 4a ... 107131 more bytes>,
+  size: 107181
+}
+
+@google-cloud/storage, aws-sdk, and @azure/storage-blob js sdks 
+https://www.geeksforgeeks.org/upload-files-to-google-cloud-storage-in-node-js/
+
+>npm i @google-cloud/storage --save --reg https://registry.npmjs.org/
+
+in gcp, one person has 10 products, then 10 different folders representing each product(in folder many images of the product)

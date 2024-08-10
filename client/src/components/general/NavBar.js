@@ -8,16 +8,18 @@ const mapStateToProps = (state) => ({
   auth: state.auth,
 }); 
 
-const NavBar = connect(mapStateToProps, {logout})(({auth, logout}) => {
+const NavBar = connect(mapStateToProps, {logout})(({auth: {isAuthenticated, user}, logout}) => {
 
-  const user = (
+  const authUser = (
     <ul>
       <li>
         <Link to="/dashboard">Dashboard</Link>
       </li>
-      <li>
-        <Link to="/register?role=merchant">Become A Merchant</Link>
-      </li>
+      { user && user.role!=="merchant" &&
+        (<li>
+          <Link to="/register?role=merchant">Become A Merchant</Link>
+        </li>
+      )}
       <li>
         <Link to="/cart">
         <i className='fas fa-cart-plus'></i>       
@@ -48,13 +50,13 @@ const NavBar = connect(mapStateToProps, {logout})(({auth, logout}) => {
   );
 
   return (
-    <nav className = "main-navbar bg-main">  
+    <nav className = "main-navbar bg-main" style={{zIndex:"999"}}>  
       <h1>
         <Link to="/">
           <i className="fas fa-store"></i> e-Shop
         </Link>
       </h1>
-      {auth.isAuthenticated? user : guest}
+      {isAuthenticated? authUser : guest}
     </nav>
   );
 });

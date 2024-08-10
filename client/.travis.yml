@@ -16,4 +16,22 @@ after_sucess:
 
   - docker build -t "$DOCKER_ID"/ecommerceapp:client .
   - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin 
-  - docker push "$DOCKER_ID"/ecommerceapp:client     
+  - docker push "$DOCKER_ID"/ecommerceapp:client    
+
+
+  #install gcp sdk, delete old ones
+  - if [! -d "$HOME/google-cloud-sdk/bin"]; then rm -rf $HOME/google-cloud-sdk; export 
+    CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
+  #after installing, set the env in current travis shell
+  - source /home/travis/google-cloud-sdk/path.bash.inc
+  
+  #can use gcloud commands now
+  - gcloud auth activate-service-account --key-file serviceAccount.json  #instead of logging in via oauth our owner account
+  - gcloud config set project eshop-431807
+  - gcloud config set compute/zone us-west1-a
+
+  #deploy to gcp
+   # - gcloud deploy app #deploys the current directory all files
+      #(uses the app.yml file to know which command to run and env to run on -node/python etc)
+  
+  - bash ./deploy.sh  

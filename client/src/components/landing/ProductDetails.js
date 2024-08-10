@@ -15,7 +15,8 @@ const mapStateToProps = (state) => ({
 
 const ProductDetails = connect(mapStateToProps, {getProduct, addToCart})((props) => {
   
-  let [product, setProduct]  = useState({});  
+  let [product, setProduct]  = useState({}); 
+  let [images, setImages] = useState([]); 
   let params = useParams(); 
   let [visible, setVisible] = useState(false);
 
@@ -23,10 +24,10 @@ const ProductDetails = connect(mapStateToProps, {getProduct, addToCart})((props)
   //componentdidmount 
   let firstUpdate = useRef(true);  
   useEffect(() => {  
-    if(firstUpdate.current){
-        firstUpdate.current = false;
-        return;
-    }
+    // if(firstUpdate.current){
+    //     firstUpdate.current = false;
+    //     return;
+    // }
     const id = params.id;
     props.getProduct(id);
      
@@ -35,13 +36,19 @@ const ProductDetails = connect(mapStateToProps, {getProduct, addToCart})((props)
   //component will receive props
   let firstUpdate2 = useRef(0);        
   useEffect(() => {  
-    if(firstUpdate2.current<2){
+    if(firstUpdate2.current<1){ //2
         firstUpdate2.current++;
         return;
     }
 
     if (props && props.product ) { 
+      let images = [];
+      images.push(props.product.thumbnail);
+      images = [...images, ...props.product.images];
+
+      setImages(images);
       setProduct(props.product);
+      
     }
   }, [props.product]);
 
@@ -138,24 +145,35 @@ const ProductDetails = connect(mapStateToProps, {getProduct, addToCart})((props)
         {product ? 
         (<Fragment>
         <div className="row" >
-        <div className='col-lg-6 col-md-6 col-sm-6'>
-            <img src="/assets/images/eshop.jpg" alt="product"/>
-        </div>    
-        <div className='col-lg-6 col-md-6 col-sm-6'>
+          <div id="carousel-thumb" className="carousel slide carousel-fade carousel-thumbnails" data-ride="carousel" style={{width: "500px"}}>
+            <div className="carousel-inner" role="listbox">
+              {images.map((image, index) => (
+                <div className={index===0 ? "carousel-item active": "carousel-item"} key={index}>
+                  <img 
+                    className="d-block w-100"
+                    src={image}
+                    alt="First Slide"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className='col-lg-6 col-md-6 col-sm-6'>
             <h1 style={{margin: '0'}}>{product.name}</h1>
             <p className='lead' style={{margin: '0'}}>Description: {product.description}</p>
             <p className='lead' style={{margin: '0'}}>Features:</p>
-            <ul style={{marginLeft: '5%', marginTop: "0"}}>
-            {   product.features &&
-                product.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                ))
+            { product.features ?
+              (<ul style={{marginLeft: '5%', marginTop: "0"}}>  
+                  {product.features.map((feature, index) => (
+                      <li key={index}>{feature}</li>
+                  ))}
+              </ul>)
+              : <p className="lead"> No feature listed </p> 
             }
-            </ul>   
             <Rate allowHalf disabled defaultValue={product.rating} style={{margin: '0'}}/>
             <p className='lead' style={{margin: '0'}}>Quantity: {product.quantity}</p>
             <h1>${product.price}</h1>
-            <Button type="primary" onClick={addProductToCart}>Add to Cart</Button> 
+            <button className="btn btn-primary" onClick={addProductToCart}>Add to Cart</button> 
         </div>              
         </div> 
         <br/>
@@ -166,13 +184,14 @@ const ProductDetails = connect(mapStateToProps, {getProduct, addToCart})((props)
           <p className='lead' style={{margin: '0'}}>
             Main Features of Product:
           </p>
-            <ul style={{marginLeft: '5%', marginTop: "0"}}>
-            {   product.features &&
-                product.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                ))
-            }
-            </ul>  
+          { product.features ?
+              (<ul style={{marginLeft: '5%', marginTop: "0"}}>  
+                  {product.features.map((feature, index) => (
+                      <li key={index}>{feature}</li>
+                  ))}
+              </ul>)
+              : <p className="lead"> No feature listed </p> 
+          }
         </Fragment>
         ) : (
            <Space size="middle">

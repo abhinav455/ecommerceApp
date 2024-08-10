@@ -8,8 +8,9 @@ services:
       - MONGO_URI=${MONGO_URI}  
   client:
     build:
-      dockerfile: Dockerfile.dev
-      context: ./       #already built image in local is there in our context local thus doesnt build again     #building again from dockerfile if not already prebuilt image
+      # dockerfile: Dockerfile.dev
+      # context: ./       #already built image in local is there in our context local thus doesnt build again     #building again from dockerfile if not already prebuilt image
+      image: bhattacharjeeabhinav/ecommerceapp:client  #use this else gcp will build again looking at this and not use the travis built prod image
     depends_on:    #dont want to run container client before server 
       - server    
     volumes:

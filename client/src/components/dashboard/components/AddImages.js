@@ -1,19 +1,19 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router";
+import React, { useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { getServer } from "../../../util";
 import axios from "axios";
 import { Button, notification } from "antd";
 import UploadImages from "../../general/UploadImages";
 
-class AddImages extends Component {
-  state = {
-    fileList: [],
-  };
-  uploadFile = (e) => {
+const AddImages = (props) => {
+
+  let params= useParams();
+  let [fileList, setfileList] = useState([]);
+  
+  const  uploadFile = (e) => {
     const data = new FormData();
-    const url = `${getServer()}/api/products/upload/thumbnail?productId=${
-      this.props.match.params.id
-    }`;
+
+    const url = `${getServer()}/api/products/upload/thumbnail?productId=${params.id}`;
     const target = e.target.files[0];
     data.append("file", target);
     axios({
@@ -37,11 +37,11 @@ class AddImages extends Component {
       });
   };
 
-  handleChange = ({ fileList }) => this.setState({ fileList });
+  const handleChange = ({ fileList }) => setfileList(fileList );
 
-  uploadImage = ({ id, file }) => {
+  const uploadImage = (file) => {
     const data = new FormData();
-    const url = `${getServer()}/api/products/upload/thumbnail?productId=${id}&multiple=true`;
+    const url = `${getServer()}/api/products/upload/thumbnail?productId=${params.id}&multiple=true`;
     const target = file.originFileObj;
     data.append("file", target);
     axios({
@@ -58,7 +58,6 @@ class AddImages extends Component {
             description: res.data.msg,
             placement: "topRight",
           });
-          this.setState({ fileList: [] });
         }
       })
       .catch((err) => {
@@ -66,34 +65,35 @@ class AddImages extends Component {
       });
   };
 
-  uploadImages = async (id) => {
-    const { fileList } = this.state;
-    const request = fileList.map((file) => this.uploadImage({ id, file }));
+  const uploadImages = async () => {
+    const request = fileList.map((file) => uploadImage(file));
     await Promise.all(request);
+    setfileList([]);
   };
 
-  render() {
     return (
       <div>
         <p className="lead">Update your product thumbnail</p>
-        <input type="file" name="file" onChange={this.uploadFile} />
+        <input type="file" name="file" onChange={uploadFile}
+        />
         <br />
         <br />
         <div>
-          <p className="lead">Upload Images for you product</p>
+          <p className="lead">Upload Images for your product</p>
           <UploadImages
-            fileList={this.state.fileList}
-            handleChange={this.handleChange}
+            fileList={fileList}
+            handleChange={handleChange}
           />
+          <br/>
           <Button
             type="primary"
-            onClick={() => this.uploadImages(this.props.match.params.id)}
+            onClick={() => uploadImages()}
           >
             Submit Images
           </Button>
-        </div>
+         </div> 
       </div>
     );
-  }
 }
-export default withRouter(AddImages);
+
+export default AddImages;

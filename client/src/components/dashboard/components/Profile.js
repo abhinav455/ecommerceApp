@@ -41,10 +41,10 @@ const Profile = connect(mapStateToProps, {
 
   let firstUpdate = useRef(true);  
   useEffect(() => {  
-    if(firstUpdate.current){
-        firstUpdate.current = false;
-        return;
-    }
+    // if(firstUpdate.current){
+    //     firstUpdate.current = false;
+    //     return;
+    // }
     
     //componentdidmount   
      props.getProfile(decodeUser().user.id);
@@ -54,14 +54,14 @@ const Profile = connect(mapStateToProps, {
   //component will receive props
   let firstUpdate2 = useRef(0);        
   useEffect(() => {  
-    if(firstUpdate2.current<2){
+    if(firstUpdate2.current<1){ //2
         firstUpdate2.current++;
         return;
     }
 
     if (
       props &&
-      props.profile && props.profile.profile
+      props.profile && props.profile.profile && props.profile.profile.socialMedia
     ) {
       const profile = props.profile.profile;
       setState({

@@ -5,10 +5,10 @@ import {Link} from "react-router-dom";
 
 const {Meta} = Card;
 
-const Product = ({product, description, link}) => {
+const Product = ({product, description, link, uploadImages, showBtn}) => {
   return (
    <div style={{padding: "10px", width: 310}}>
-    <Link to={link}>
+    <Link to={link || ""}>
         <Card
             hoverable
             style={{
@@ -17,11 +17,12 @@ const Product = ({product, description, link}) => {
             cover={
             <img
                 alt="example"
-                src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                src={product.thumbnail}
             />
             }
         >
             <Meta title={product.name} description={description}/>
+            {showBtn && <Link className="btn btn-primary" to={uploadImages} >Add Images</Link>}
         </Card>
     </Link> 
    </div>  
@@ -31,7 +32,7 @@ const Product = ({product, description, link}) => {
 Product.propTypes = {
     product: propTypes.object.isRequired,
     description: propTypes.object.isRequired,
-    buttonName: propTypes.string,
+    //buttonName: propTypes.string,
 }
 
 export default Product;

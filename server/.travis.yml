@@ -19,6 +19,11 @@ script:
 after_sucess:
   - openssl  enc -aes256 -d -in serviceAccount.json.enc -out serviceAccount.json -k $SERVICE_KEY -md sha256 
 
+    #build production grade dockerfile
+  - docker build -t "$DOCKER_ID"/ecommerceapp:server .
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin 
+  - docker push "$DOCKER_ID"/ecommerceapp:server   
+
   #install gcp sdk, delete old ones
   - if [! -d "$HOME/google-cloud-sdk/bin"]; then rm -rf $HOME/google-cloud-sdk; export 
     CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
@@ -28,13 +33,7 @@ after_sucess:
   #can use gcloud commands now
   - gcloud auth activate-service-account --key-file serviceAccount.json  #instead of logging in via oauth our owner account
   - gcloud config set project eshop-431807
-  - gcloud config set compute/zone us-west2-a
-   
-
-  #build production grade dockerfile
-  - docker build -t "$DOCKER_ID"/ecommerceapp:server .
-  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_ID" --password-stdin 
-  - docker push "$DOCKER_ID"/ecommerceapp:server   
+  - gcloud config set compute/zone us-west1-a
 
   #deploy to gcp
    # - gcloud deploy app #deploys the current directory all files

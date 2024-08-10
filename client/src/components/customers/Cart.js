@@ -18,10 +18,10 @@ const Cart = connect(mapStateToProps, { getCart, removeFromCart })((props) => {
   //getCart componentdidmount
   let firstUpdate = useRef(true);
   useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
+    // if (firstUpdate.current) {
+    //   firstUpdate.current = false;
+    //   return;
+    // }
 
     props.getCart();
   }, []);
@@ -29,7 +29,7 @@ const Cart = connect(mapStateToProps, { getCart, removeFromCart })((props) => {
   //component will receive props
   let firstUpdate2 = useRef(0);
   useEffect(() => {
-    if (firstUpdate2.current < 2) {
+    if (firstUpdate2.current < 1) { //2
       firstUpdate2.current++;
       return;
     }

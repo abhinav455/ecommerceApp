@@ -2,8 +2,9 @@ version: "3"
 services:
   server:
     build:
-      dockerfile: Dockerfile.dev
-      context: ./    #already built image in local is there in our context local thus doesnt build again
+      # dockerfile: Dockerfile.dev
+      # context: ./    #already built image in local is there in our context local thus doesnt build again
+      image: bhattacharjeeabhinav/ecommerceapp:server  #use this else gcp will build again looking at this and not use the travis built prod image
     volumes:
     #  - ./node_modules:/server/node_modules
       - ./:/server

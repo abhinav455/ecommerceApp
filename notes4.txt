@@ -510,6 +510,7 @@ decrypt in gcp/travis ci, just need to create one env var i.e our aes key
 
 bgz8xe95dTeftkB - pass
 
+
 -------------------------------------
 
 react tests, >react-scripts test, its own testing framework of cra/react like , 
@@ -527,6 +528,8 @@ runs our test and also react prebuilt tests for all files and components
  "build": "react-scripts build"
  "server" : "serve -s build"
 >npm run server 
+
+make your own express app to server built index.html and static files js and css in build folder
 
 By default, serve will listen on 0.0.0.0:3000 and serve the
 current working directory on that address
@@ -652,7 +655,82 @@ cron:
 ##################
 
 
+app.use(express.static(path.join(__dirname, "/build"))); //express should understand the path //middleware to serve other static files
+ server: node app.js ////"serve -s build"
+update stripe secret key but need to updated env vars also thus let it be
+
+
 app.yaml
 https://cloud.google.com/appengine/docs/flexible/reference/app-yaml?tab=node.js#top
+
+
+resources:
+  cpu: 2
+  memory_gb: 2.3
+  disk_size_gb: 10
+  volumes:
+  - name: ramdisk1
+    volume_type: tmpfs
+    size_gb: 0.5
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 15
+  cool_down_period_sec: 180
+  cpu_utilization:
+    target_utilization: 0.6
+  target_concurrent_requests: 100
+
+
+>gcloud app logs tail -s default
+enable compute and app engine apis, app engine flexible api and service management api(for service account) for the project
+
+-q flag to run in quiet mode for non interactive ci/cd job
+
+>gcloud config set compute/zone us-west2-a //uses compute engine apis thus need to set it
+https://console.cloud.google.com/apis/api/compute.googleapis.com/metrics?project=eshop-431807
+
+gcloud cli after deploying on travis gives a public url for the app, go to the url and see if server app is up
+now need to take this url and give to client react app to connect
+server public url - https://eshop-431807.uc.r.appspot.com/
+client public url - https://client-dot-eshop-431807.uc.r.appspot.com
+
+>gcloud app instances ssh "aef-default-20240808t163658-bn7v" --service "default" --version "20240808t163658" --project "eshop-431807"
+>gloud app browse -s client  //or default
+
+-----
+//app engine uses the docker-compose.yml by default.
+//app engine maintins its own docker built image and built context. but in docker-compose dont at built context as will not have context the first time.
+// just add pull from hub for gcp which the travis ci pushed else purpose defeated
+uses dockerfile and build again on gcp everytime only. why not pulling from dockerhub?
+
+
+IMP : the service: name app.yml unique. thus always knows that same service being deployed again, do versioning and give same url and same docker context.
+
+
+IMPIMP - not like 2 containers running on 2 vms, but 2 containers running on same vm OR 2vm but on ecs like thus acts like one vm only
+      but mayb like 2 different vms only, one doesnt know another. but since we have public url client can talk to server. 
+      
+      we are not using docker-compose(just using docker compose locally) but still both containers/services running on different containers on different
+      vms able to talk to each other as we have public url and cors enabled all on server
+  
+  I believe not. Flexible runtime is for auto-scaling a single Dockerfile-based app
+  It is not possible at this time to use docker-compose to have multiple application containers within a single App Engine instance. This does seem however to be by design.
+  means for each container/service serverless application creating an instance.
+  https://stackoverflow.com/questions/39877521/using-docker-compose-within-google-app-engine
+
+
+  and creates image everytime.
+  I'm looking for a way to use gcloud app deploy...  to directly grab a Docker address from Docker Hub and deploy straight to Google App Engine. If there's no way, that's fine but I thought I'd check here.
+  I looked around and didn't see a way to do this directly. It seems that I have to push the container from Docker Hub to Google Container Registry then from there I can run gcloud app deploy --image-url=[HOSTNAME]/[PROJECT-ID]/[IMAGE] to deploy.
+  ans) It might be a better idea to just use a Compute Engine instance. I can push a container from a public source or public/private from Container Registry.
+      https://stackoverflow.com/questions/71446771/is-there-a-way-to-push-a-docker-container-from-dockerhub-to-google-app-engine
+      >gcloud compute instances create-with-container VM_NAME \ --container-image DOCKER_IMAGE
+
+
+IMP- uses https by default gcp giving us public ip, and then bind to the container http port running. 
+     this is the power of serverless app instance gcp or azure app or aws app, gcp/cloud does all this by itself
+
+
+
 
 

@@ -11,10 +11,10 @@ const PaymentConfirm = () => {
 
   const firstUpdate = useRef(true); 
   useEffect(() => {
-    if(firstUpdate.current){
-      firstUpdate.current = false;
-      return;
-  }
+  //   if(firstUpdate.current){
+  //     firstUpdate.current = false;
+  //     return;
+  // }
 
   setPaymentIntent(new URLSearchParams(location.search).get("payment_intent")); 
   //setPaymentIntentClientSecret(new URLSearchParams(location.search).get("payment_intent_client_secret");
