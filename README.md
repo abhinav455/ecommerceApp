@@ -10,6 +10,6 @@ Running locally -
 
 Running on Google Cloud with Travis CI-
 1) Configure Travis to listen to your Github repo, set Dockerhub credentials in Travis ENV variables
-2) Add your GCP configuration  in .env file and encrypt to .enc , create a ServiceAccount inside you GCP and enrypt the file to serviceAccount.json.enc 
+2) Add your GCP and Stripe configuration  in .env file and encrypt to .enc , create a ServiceAccount inside you GCP and enrypt the file to serviceAccount.json.enc 
 3) Push your client and server code to their repective github repos. Travis builds and deploys to Dockerhub and GCP App Engine and return a public url of the frontend app.
 4) Navigate to the url in your browser
