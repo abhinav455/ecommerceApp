@@ -1,8 +1,11 @@
 E-Commerce App
 
 Running locally - 
+
 1)Clone the repo. 
+
 2)Cd into the Client and Server folder and do npm install 
+
 3)Run the client on localhost:8080 using >npm run build ,followed by >npm run server command. Run server on localhost:5000 using >npm run server 
 
 Running on Google Cloud with Travis CI-
