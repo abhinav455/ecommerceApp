@@ -1,3 +1,5 @@
+E-Commerce App
+
 Running locally - 
 1)Clone the repo. 
 2)Cd into the Client and Server folder and do npm install 
